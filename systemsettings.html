@@ -1,0 +1,336 @@
+<!doctype html>
+<html>
+<head>
+
+    <!--系统设置-->
+
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>AI</title>
+    <link type="text/css" rel="stylesheet" href="style/reset.css">
+    <link type="text/css" rel="stylesheet" href="style/index.css">
+    <link type="text/css" rel="stylesheet" href="style/swiper.min.css">
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/path.js"></script>
+    <script type="text/javascript" src="js/md5.js"></script>
+
+    <script>
+
+
+        /*预设每页记录数*/
+        var pagesize = 10;
+        var ip = 0;
+        var device;
+
+
+        $(function () {
+            querydevice(1);
+        });
+
+
+        /*点击分页*/
+        function querydevice(index) {
+
+            $("#lilist li").removeAttr("class");//先将页码上的class去掉
+
+            $("#device").html("");//首先将页面上的数据清除
+
+            $("#lilist").html("");//首先将页面上的数据清除
+
+            map.currentPage = index;
+            map.pageSize = pagesize;
+            var sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.get(path + "/v1/device", map, function (res) {
+//分页开始***********//
+                    var total = 0;
+                    var s = res.total / pagesize;
+                    var y = res.total % pagesize;
+                    if (y != 0) {
+                        total = s + 1;
+                    } else {
+                        total = s;
+                    }
+                    //预设分页（将记录总数取出来除以 pagesize 就得到了页码数）
+                    $("#lilist").append("<li><a href='#'>" + "«" + "</a></li>");
+                    for (var c = 1; c <= total; c++) {
+
+                        $("#lilist").append("<li onclick='querydevice(" + c + ")' id='" + c + "' name='" + c + "'><a   >" + c + "</a></li>");
+                    }
+                    //最后加上一个下一页
+                    $("#lilist").append("<li><a href='#'>" + "»" + "</a></li>");
+//分页结束***********//
+                    $("#" + index).addClass("abe-active");//之后再将class渲染到指定的页码上
+
+                    for (var o = 0; o < res.data.length; o++) {
+
+                        var name = res.data[o].name;
+                        if (res.data[o].name == null) {
+                            name = " ";
+                        } else {
+                            var operation = "";
+                            var path = "";
+                            if (res.data[o].platform == 'ai') {
+                                operation = "关联设备";
+                                path="<a  href='#' class='vi-green' onclick='relevancedevice(" + res.data[o].id + ")'><i class='iconfont'>";
+
+                            } else if (res.data[o].platform == 'box') {
+                                operation = "设备初始化";
+                                path="<a  href='#' class='vi-green' onclick='deviceinit(" + res.data[o].id + ")'><i class='iconfont'>";
+                            } else{
+                                operation = "";
+                            }
+                            
+                            ip = res.data[o].ipAddress;
+
+                            $("#device").append(
+                                "<tr>" +
+                                "<td><div>" + name + "</div></td>" +
+                                "<td><div>" + res.data[o].ipAddress + "</div></td>" +
+                                "<td><div>" + res.data[o].macAddress + "</div></td>" +
+                                "<td><div>" + res.data[o].createTime + "</div></td>" +
+                                "<td><div>" + res.data[o].platform + "</div></td>" +
+                                "<td><a href='systemredact.html' class='vi-green' onclick='update(" + res.data[o].id + ")'  ><i class='iconfont'>" +
+                                "</i>" + "重命名" + "</a ><em class='abe-space'></em>"+
+                                path+
+                                "</i>" + operation + "</a></td>" +
+                                "</tr>"
+                            );
+
+                        }
+                    }
+                }
+                , 'json');
+        }
+
+
+        function queryrelevancefordeviceid(index) {
+            $("#devicerele").html("");
+
+            map.deviceid = index;
+            var sign = $.md5(jsonSort(map) + token + time + time);
+
+            map.sign = sign.toUpperCase();
+            $.post(path + "/v1/device/queryrelevancefordeviceid", map, function (res) {
+                for (var o = 0; o < res.data.length; o++) {
+                    $("#devicerele").append(
+                        "<tr>" +
+                        "<td><div>" + res.data[o].name + "</div></td>" +
+                        "<td><div>" + res.data[o].ipAddress + "</div></td>" +
+                        "<td><a href='#' class='vi-green' onclick='deleterele(" + res.data[o].id + ")'  ><i class='iconfont'>" +
+                        "</i>" + "删除关联" + "</a ></td>" +
+                        "</tr>"
+                    );
+                }
+            }, "json");
+        }
+
+
+        function deleterele(index) {
+
+            map.relevanceid = index;
+            var sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.post(path + '/v1/relevance/deleterelevanceforid', map, function (res) {
+                if (res.code == 0) {
+                    confirm("删除成功");
+                    queryrelevancefordeviceid(ip);
+                    boxdevicelist(device);
+                } else {
+                    confirm("删除失败");
+                }
+            }, "json");
+
+        }
+
+
+        function relevancedevice(index) {
+
+            ip = index;
+
+            queryrelevancefordeviceid(index);
+            map.ids = index;
+            var sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.get(path + '/v1/device/ids', map, function (ress) {
+                device = ress;
+                boxdevicelist(ress);
+            }, "json");
+
+        }
+
+        function deviceinit(index) {
+            map.id = index;
+            console.log(typeof index);
+            var sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.post(path + '/v1/device/init', map, function (ress) {
+            }, "json");
+        }
+
+
+
+
+        function boxdevicelist(ress) {
+            var name = "";
+            $("#addgrouping").show();
+            $("#mask").show();
+            $("#boxdevicelist").html("");
+
+            map.deviceip = ress.data.ipAddress;
+            var sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.get(path + "/v1/device/querydevicefrobox", map, function (res) {
+
+                $("#boxdevicelist").append("<option value='0'>" + "请选择" + "</option>");
+                for (var i = 0; i < res.data.length; i++) {
+                    //有名字显示名字（没有名字显示ip地址）
+                    if (res.data[i].name == "") {
+                        name = res.data[i].ipAddress;
+                    } else {
+                        name = res.data[i].name;
+                    }
+                    $("#boxdevicelist").append("<option value='" + res.data[i].id + "'>" + name + "</option>");
+                }
+
+            }, "json");
+        }
+
+
+        //关联设备提交方法
+        function relevancedevicesubmit() {
+
+            map.aideviceId = ip;
+            map.boxdeviceId = $("#boxdevicelist").val();
+            var sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.post(path + "/v1/relevance/addrelevance", map, function (res) {
+                if (res.code == 0) {
+                    confirm("关联成功");
+                    queryrelevancefordeviceid(ip);
+                    boxdevicelist(device);
+                } else {
+                    confirm("关联失败");
+                }
+            }, "json");
+
+        }
+
+
+        function closeaddgrouping() {
+            $("#addgrouping").hide();
+            $("#mask").hide();
+        }
+
+
+        function update(index) {
+            window.localStorage.setItem("deviceid", index);
+        }
+
+
+    </script>
+
+
+</head>
+
+<body>
+<header class="inhead-box">
+    <div class="inhead"><a href="#" class="logo abe-fl">人脸识别系统</a>
+        <div class="user-info abe-fr"><span><em class="vi-green">admin</em>，您好！ </span> <a href="#" class="uhead"><img
+                src="images/user_head.jpg" alt=""></a></div>
+        <nav class="abe-fr"><a href="customermanage.html">会员管理</a><a href="dataanalysis.html">数据分析</a><a
+                href="aishow.html">AI显示</a><a
+                href="systemsettings.html" class="active">系统设置</a><a href="extendmodule.html">扩展模块</a></nav>
+    </div>
+</header>
+<div class="blank20"></div>
+<div class="main">
+    <div class="menu abe-fl">
+        <h1 class="title"><a href="index.html"><i class="iconfont abe-ft24 mrg_10">&#xe601;</i>回首页</a></h1>
+        <ul>
+            <li class="active"><a href="设备管理.html"><i class="iconfont">&#xe6b5;</i>设备管理</a></li>
+            <li><a href="extendmodule.html"><i class="iconfont">&#xe610;</i>扩展模块</a></li>
+        </ul>
+    </div>
+    <div class="content abe-fr">
+        <div class="local"> 当前位置<em class="abe-space">&gt;</em><span class="abe-gray3">会员管理</span></div>
+        <div class="table-box">
+            <table width="100%" border="1" class="user-tb">
+                <thead>
+                <tr>
+                    <th>设备名称</th>
+                    <th>设备IP</th>
+                    <th>设备序列号</th>
+                    <th>注册时间</th>
+                    <th>平台</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="device"></tbody>
+            </table>
+        </div>
+        <div class="abe-page course-list-page pdt_30 pdb_30">
+            <ul class="abe-pagination admin-content-pagination" id="lilist"></ul>
+        </div>
+    </div>
+
+
+    <!--创建分组-->
+    <div class="popup-win group-pop" style="display: none" id="addgrouping">
+        <div class="pop-tit abe-ofl"><span class="abe-fl tit">关联设备</span> <a href="#" class="close iconfont abe-fr"
+                                                                             onclick="closeaddgrouping()">&#xe602;</a>
+        </div>
+
+        <div class="pop-info">
+
+            <div class="table-box">
+                <table width="100%" border="1" class="user-tb">
+                    <thead>
+                    <tr>
+                        <th>设备名称</th>
+                        <th>设备IP</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="devicerele">
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 30px;margin-left: 30px">
+                <ul class="user-form-ul pdl_40" style="display: ">
+                    <li>
+                        <select id="boxdevicelist"> </select>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="pop-sub">
+            <input type="button" class="vi-btn-green mrg_20" onclick="relevancedevicesubmit()" value="确定">
+            <input type="button" class="vi-btn-gray" onclick="closeaddgrouping()" value="取消">
+        </div>
+
+    </div>
+
+
+    <div class="popup-bg" style="display:none;z-index: 0" id="mask"></div>
+</div>
+
+
+<script>
+    $(function () {
+        $(".popup-win").each(function () {
+            var pw = $(this).width() / 2;
+            var ph = $(this).outerHeight() / 2;
+            $(this).css({"margin-left": -pw, "margin-top": -ph});
+        });
+    });
+</script>
+
+<div class="icp">Copyright © 2006 - 2015 人脸识别系统版权所有 沪ICP备 0000001号</div>
+</body>
+</html>

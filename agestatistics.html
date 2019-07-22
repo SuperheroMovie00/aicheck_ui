@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+
+    <!--年龄统计-->
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>AI</title>
+    <link type="text/css" rel="stylesheet" href="style/index.css">
+    <link type="text/css" rel="stylesheet" href="style/reset.css">
+    <link type="text/css" rel="stylesheet" href="style/swiper.min.css">
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <!--<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>-->
+    <script type="text/javascript" src="js/echarts.min.js"></script>
+    <script type="text/javascript" src="js/path.js"></script>
+    <script type="text/javascript" src="js/md5.js"></script>
+</head>
+
+<body>
+<header class="inhead-box">
+    <div class="inhead"><a href="#" class="logo abe-fl">人脸识别系统</a>
+        <div class="user-info abe-fr"><span><em class="vi-green">admin</em>，您好！ </span> <a href="#" class="uhead"><img
+                src="images/user_head.jpg" alt=""></a></div>
+        <nav class="abe-fr"><a href="customermanage.html">会员管理</a><a href="dataanalysis.html" class="active">数据分析</a><a href="aishow.html">AI显示</a><a
+                href="systemsettings.html">系统设置</a><a href="extendmodule.html">扩展模块</a></nav>
+    </div>
+</header>
+<div class="blank20"></div>
+<div class="main">
+    <div class="menu abe-fl">
+        <h1 class="title"><a href="index.html"><i class="iconfont abe-ft24 mrg_10">&#xe601;</i>回首页</a></h1>
+        <ul>
+            <li ><a href="dataanalysis.html"><i class="iconfont">&#xe6bb;</i>性别统计</a></li>
+            <li class="active"><a href="agestatistics.html"><i class="iconfont">&#xe609;</i>年龄统计</a></li>
+            <li><a href="visitors.html"><i class="iconfont">&#xe609;</i>客流统计</a></li>
+        </ul>
+    </div>
+    <div class="content abe-fr">
+        <div class="local"> 当前位置<em class="abe-space">&gt;</em><span class="abe-gray3">性别统计</span></div>
+        <div id="container" style="height:400px"></div>
+
+        <script type="text/javascript">
+
+
+            /*查出根据年龄不同分段的统计*/
+            var dom = document.getElementById("container");
+            var myChart = echarts.init(dom);
+            var app = {};
+            option = null;
+            app.title = '坐标轴刻度与标签对齐';
+            var sign= $.md5(jsonSort(map)+token+time+time);
+
+            map.sign=sign.toUpperCase();
+            /*查出根据性别的统计*/
+            $.get(path + "/v1/statistical/age", map, function (res) {
+
+                option = {
+                    title : {
+                        text: '每日访客年龄统计',
+
+                    },
+                    tooltip : {
+                        trigger: 'axis'
+                    },
+
+                    toolbox: {
+                        show : true,
+                        feature : {
+                            dataView : {show: true, readOnly: false},
+                            magicType : {show: true, type: ['line', 'bar']},
+                            restore : {show: true},
+                            saveAsImage : {show: true}
+                        }
+                    },
+                    calculable : true,
+                    xAxis : [
+                        {
+                            type : 'category',
+                            data : ['0~12岁','13~18岁','19~30岁','31~50岁','51~70岁','>70岁']
+                        }
+                    ],
+                    yAxis : [
+                        {
+                            type : 'value'
+                        }
+                    ],
+                    series : [
+                        {
+                            name:'人数',
+                            type:'bar',
+                            data:res.data,
+                            markPoint : {
+                                data : [
+                                    {type : 'max', name: '最大值'},
+                                    {type : 'min', name: '最小值'}
+                                ]
+                            },
+                            markLine : {
+                                data : [
+                                    {type : 'average', name: '平均值'}
+                                ]
+                            }
+                        }
+
+                    ]
+                };
+
+                if (option && typeof option === "object") {
+                    myChart.setOption(option, true);
+                }
+
+            }, "json");
+
+        </script>
+    </div>
+</div>
+<div class="icp">Copyright © 2006 - 2015 人脸识别系统版权所有 沪ICP备 0000001号</div>
+</body>
+</html>

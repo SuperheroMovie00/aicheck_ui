@@ -1,0 +1,235 @@
+<!doctype html>
+<html>
+<head>
+
+    <!--扩展模块-->
+
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>AI</title>
+    <link type="text/css" rel="stylesheet" href="style/index.css">
+    <link type="text/css" rel="stylesheet" href="style/reset.css">
+    <link type="text/css" rel="stylesheet" href="style/swiper.min.css">
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/path.js"></script>
+    <script type="text/javascript" src="js/md5.js"></script>
+
+    <script>
+
+        $(function () {
+            queryextend();
+        });
+
+        function queryextend() {
+            $("#extend").html("");
+            var sign = $.md5(token + time + time);
+
+            $.get(path + "/v1/extend",
+                {
+                    timestamp:time,
+                    nonce:time,
+                    token:token,
+                    sign:sign.toUpperCase(),
+                }
+                , function (res) {
+                for (var c = 0; c < res.data.length; c++) {
+                    $("#extend").append("<li class='item'><a href='" + res.data[c].url + "' ondblclick='deleteextend(" + res.data[c].id + ")'>" + res.data[c].name + "</a></li>");
+                }
+            }, "json");
+        }
+
+
+        //新增模块
+        function addextend() {
+
+            $("#addextend").show();
+
+        }
+
+        function deleteextend(index) {
+            map.id = index;
+            var sign = $.md5(jsonSort(map)+token + time + time);
+            map.sign = sign.toUpperCase();
+            $.post(path + "/v1/extend/deleteextend", map/*{
+            id:index,
+           }*/, function (res) {
+                if (res.code == 0) {
+                    confirm("删除成功");
+                    setextend();
+                } else {
+                    confirm("删除失败");
+                    setextend();
+                }
+            }, "json");
+        }
+
+
+        function addextendcommit() {
+
+            map.name = $("#extendname").val();
+            map.url = $("#extendurl").val();
+            var sign = $.md5(jsonSort(map)+token + time + time);
+            map.sign = sign.toUpperCase();
+            $.post(path + "/v1/extend/addextend", map, function (res) {
+                if (res.code == 0) {
+                    confirm("添加模块成功");
+
+                    setextend();
+                    $("#addextend").hide();
+                    $("#extendname").val("");
+                    $("#extendurl").val("http://");
+                } else {
+                    confirm("添加模块失败");
+
+                    setextend();
+                    $("#addextend").hide();
+                    $("#extendname").val("");
+                    $("#extendurl").val("http://");
+                }
+            }, "json");
+
+        }
+
+        function setextend() {
+            $("#setextend").show();
+            $("#mask").show();
+            $("#dbtags").html("");
+            var sign = $.md5( token + time + time);
+
+            $.get(path + "/v1/extend",
+                {
+                    timestamp:time,
+                    nonce:time,
+                    token:token,
+                    sign:sign.toUpperCase(),
+                }
+                , function (res) {
+                for (var c = 0; c < res.data.length; c++) {
+                    $("#dbtags").append("<li class='item' ondblclick='deleteextend(" + res.data[c].id + ")' ><a href='#'>" + res.data[c].name + "</a></li>");
+                }
+            }, "json");
+        }
+
+        function affirmextend() {
+            $("#setextend").hide();
+            queryextend();
+
+        }
+
+        function guanbi() {
+            $("#setextend").hide();
+            $("#mask").hide();
+            queryextend();
+        }
+
+
+        function closeaddgrouping() {
+            $("#addextend").hide();
+        }
+
+
+    </script>
+
+
+</head>
+
+<body>
+<header class="inhead-box">
+    <div class="inhead"><a href="#" class="logo abe-fl">人脸识别系统</a>
+        <div class="user-info abe-fr"><span><em class="vi-green">admin</em>，您好！ </span> <a href="#" class="uhead"><img
+                src="images/user_head.jpg" alt=""></a></div>
+        <nav class="abe-fr"><a href="customermanage.html">会员管理</a><a href="dataanalysis.html">数据分析</a><a
+                href="aishow.html">AI显示</a><a href="systemsettings.html">系统设置</a><a href="extendmodule.html"
+                                                                                    class="active">扩展模块</a></nav>
+    </div>
+</header>
+<div class="blank20"></div>
+<div class="main">
+    <div class="menu abe-fl">
+        <h1 class="title"><a href="index.html"><i class="iconfont abe-ft24 mrg_10">&#xe601;</i>回首页</a></h1>
+        <ul>
+            <li><a href="systemsettings.html"><i class="iconfont">&#xe6b5;</i>设备管理</a></li>
+            <li class="active"><a href="extendmodule.html"><i class="iconfont">&#xe610;</i>扩展模块</a></li>
+        </ul>
+    </div>
+    <div class="content abe-fr">
+        <div class="local"> 当前位置<em class="abe-space">&gt;</em><span class="abe-gray3">会员管理</span></div>
+        <div class="add-mod">
+            <div class="add-mod">
+                <ul class="mod-ul abe-ofl" id="extend"></ul>
+                <div class="pdt_30 pdl_50">
+
+                    <a href="#" class="abe-ft16" onclick="setextend()"><i class="iconfont mrg_5">&#xe660;</i>设置</a>
+                </div>
+                <ul class="user-form-ul pdt_30 pdl_40" style="display: none;">
+                    <li><span>链接名称<i class="abe-red"></i></span></li>
+                    <li>
+                        <input type="text" class="text">
+                    </li>
+                    <li><span>链接地址<i class="abe-red"></i></span></li>
+                    <li>
+                        <input type="text" class="text">
+                    </li>
+
+                    <li class="com-submit pdt_10">
+                        <input type="button" class="vi-btn-green mrg_10" value="添加">
+                        <input type="button" class="vi-btn-gray" value="重置">
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="popup-win add-sb" id="setextend"
+         style=" z-index:1;display: none;height: auto;border: #06b3be solid 1px">
+
+        <div class="pop-tit abe-ofl"><span class="abe-fl tit">设置模块</span>
+            <a href="#" class="close iconfont abe-fr" onclick="guanbi()">&#xe602;</a></div>
+
+
+        <div style="padding-top: 20px;"><font color="red" size="2">扩展模块：(双击删除)</font></div>
+
+        <!--数据库中的标签-->
+        <ul class="mod-cc abe-ofl" id="dbtags"></ul>
+
+        <a href="#" class="abe-ft16" onclick="addextend()"><i class="iconfont mrg_5">&#xe660;</i>新增模块</a>
+        <div style="position:relative;" align="center">
+            <input type="button" class="vi-btn-green" onclick="affirmextend()" value="确认修改">
+            <input type="button" class="vi-btn-orange mlg_15" onclick="guanbi()" value="取消修改">
+        </div>
+    </div>
+
+
+    <div class="popup-win group-pop" style=" z-index:2;display:none ;height: 300px;border: #06b3be solid 1px"
+         id="addextend">
+        <div class="pop-tit abe-ofl"><span class="abe-fl tit">添加模块</span> <a href="#" class="close iconfont abe-fr"
+                                                                             onclick="closeaddgrouping()">&#xe602;</a>
+        </div>
+        <ul class="user-form-ul pdl_40" style="display: ;padding-top: 50px" id="ullist">
+            <li><span>模块名称：<i class="abe-red"></i></span></li>
+            <li>
+                <input placeholder="请输入内容" type="text" id="extendname" class="text">
+            </li>
+            <li><span>链接路径：<i class="abe-red"></i></span></li>
+            <li>
+                <input placeholder="请输入内容" type="text" value="http://" id="extendurl" class="text">
+            </li>
+        </ul>
+        <div class="pop-sub">
+            <input type="button" class="vi-btn-green mrg_20" onclick="addextendcommit()" value="确定">
+            <input type="button" class="vi-btn-gray" onclick="closeaddgrouping()" value="取消">
+        </div>
+    </div>
+
+
+    <div class="popup-bg" style="display:none;z-index: 0" id="mask"></div>
+
+
+</div>
+<div class="icp">Copyright © 2006 - 2015 人脸识别系统版权所有 沪ICP备 0000001号</div>
+</body>
+</html>

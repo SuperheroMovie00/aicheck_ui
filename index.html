@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+
+    <!--初始界面-->
+
+    <meta charset="utf-8">
+    <title>人脸识别系统</title>
+    <link type="text/css" rel="stylesheet" href="style/index.css">
+    <link type="text/css" rel="stylesheet" href="style/reset.css">
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/path.js"></script>
+
+
+    <script>
+
+
+        //点击登录按钮
+        function login() {
+            $("#loginwin").show();
+            $("#cover").show();
+        }
+
+
+        //提交登录方法
+        function submit() {
+            $.post(path + "", map, function (res) {
+
+                if(res.code==0){
+                    confirm("登录成功");
+                }else{
+                    confirm("登录失败");
+                }
+            }, "json");
+        }
+
+
+    </script>
+
+
+</head>
+
+<body>
+<header class="homehead-box">
+    <div class="homehead"><a href="#" class="homelogo">人脸识别系统</a>
+        <div class="link"><a href="#" onclick="login()" class="vi-green">登录</a></div>
+    </div>
+</header>
+<div class="course">
+    <ul>
+        <li>
+            <div class="co-info"><i class="iconfont">&#xe73c;</i>
+                <article>
+                    <h1>会员管理</h1>
+                    会员管理详情！
+                </article>
+                <a href="customermanage.html">进入系统</a></div>
+        </li>
+        <li class="mathematics">
+            <div class="co-info"><i class="iconfont">&#xe6bb;</i>
+                <article>
+                    <h1>数据分析</h1>
+                    数据分析详情！
+                </article>
+                <a href="dataanalysis.html">进入系统</a></div>
+        </li>
+        <li class="english">
+            <div class="co-info"><i class="iconfont">&#xe6b5;</i>
+                <article>
+                    <h1>aishow</h1>
+                    AI显示详情！
+                </article>
+                <a href="aishow.html">进入系统</a></div>
+        </li>
+        <li class="science">
+            <div class="co-info"><i class="iconfont">&#xe660;</i>
+                <article>
+                    <h1>扩展模块</h1>
+                    扩展模块详情！
+                </article>
+                <a href="extendmodule.html">进入系统</a></div>
+        </li>
+    </ul>
+</div>
+<div class="icp">Copyright © 2006 - 2015 人脸识别系统版权所有 沪ICP备 0000001号</div>
+<div class="login-pop" style="display:none ;" id="loginwin">
+    <ul>
+        <li class="tit"><span class="abe-fl">登录系统</span>
+            <!--<a href="#" class="close iconfont abe-fr" onclick="closelogin()">&#xe60a;</a>--></li>
+        <li><input type="text" class="txt" placeholder="请输入账号"></li>
+        <li><input type="password" class="txt" placeholder="请输入密码"></li>
+        <li><input type="submit" class="btn" onclick="submit()" value="登入人脸识别系统系统"></li>
+    </ul>
+</div>
+<div class="popup-bg" style="display: none;" id="cover"></div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link type="text/css" rel="stylesheet" href="style/reset.css">
+    <link type="text/css" rel="stylesheet" href="style/index.css">
+    <link type="text/css" rel="stylesheet" href="style/swiper.min.css">
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/path.js"></script>
+    <script type="text/javascript" src="js/md5.js"></script>
+
+
+    <script>
+
+
+        $(function () {
+
+            var sign = $.md5( token + time + time);
+            $.get(path + "/v1/statistical/week",
+               {
+                   timestamp:time,
+                   nonce:time,
+                   token:token,
+                   sign:sign.toUpperCase(),
+               }
+            , function (res) {
+
+            }, "json");
+
+
+        });
+    </script>
+
+
+</head>
+<body>
+
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+<head>
+
+    <!--会员管理-->
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>AI</title>
+    <link type="text/css" rel="stylesheet" href="style/index.css">
+    <link type="text/css" rel="stylesheet" href="style/reset.css">
+    <link type="text/css" rel="stylesheet" href="style/swiper.min.css">
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/path.js"></script>
+    <script type="text/javascript" src="js/md5.js"></script>
+
+
+</head>
+
+<script>
+
+    var html ;
+    var pagesize=10;
+
+    $(function () {
+        //刚进入会员管理页面  将页数默认为1 每页记录数为10 开始查询数据
+        querybypage(1);
+    });
+
+
+    function querybypage(index) {
+
+        $("#lilist li").removeAttr("class");//先将页码上的class去掉
+
+        $("#customerlist").html("");
+
+        $("#lilist").html("");
+
+        map.currentPage=index;
+        map.pageSize=pagesize;
+
+        var sign= $.md5(jsonSort(map)+token+time+time);
+        map.sign=sign.toUpperCase();
+
+        $.get(path+"/v1/customer",map /*{
+            currentPage: index,
+            pageSize: pagesize
+        }*/, function (res) {
+
+            //将数据库中取出的json以id排序
+            var json=res.data.sort(compare("id"));
+
+//分页开始***********//
+            var total=0;
+            var s=res.total/pagesize;
+            var y=res.total%pagesize;
+            if(y!=0){
+                total=s+1;
+            }else{
+                total=s;
+            }
+            //预设分页（将记录总数取出来除以 pagesize 就得到了页码数）
+            $("#lilist").append("<li><a href='#'>"+"«"+"</a></li>");
+            for (var c = 1; c <= total; c++) {
+
+                $("#lilist").append("<li onclick='querybypage(" + c + ")' id='"+c+"' name='" + c + "'><a>" + c + "</a></li>");
+            }
+            //最后加上一个下一页
+            $("#lilist").append("<li><a href='#'>"+"»"+"</a></li>");
+            //分页结束***********//
+
+            $("#"+index).addClass("abe-active");//之后再将class渲染到指定的页码上
+            for (var o = 0; o < res.data.length; o++) {
+                html=" ";
+                var level = "";
+                switch (res.data[o].level) {
+                    case 2:
+                        level = "白银";
+                        break;
+                    case 3:
+                        level = "黄金";
+                        break;
+                    case 4:
+                        level = "铂金";
+                        break;
+                    case 1:
+                        level = "普通";
+                        break;
+                }
+                var tags='';
+
+                for(var c=0;c<res.data[o].tags.length;c++) {
+                    tags+=res.data[o].tags[c].name+"&nbsp";
+                }
+                html += "<tr>";
+                html += "<td class='num'>" + res.data[o].id + "</td>";
+                html += "<td><div class='uheadbox'> <img src='"+res.data[o].imgUrl+"' alt=''> <span>" + res.data[o].name + "</span> </div></td>";
+                html += "<td>" + level + "</td>";
+                html += "<td>" + res.data[o].mobile + "</td>";
+                html += "<td><em class='tip'>" + res.data[o].interestName + "</em></td>";
+                html +="<td><em class='tip'>" + tags + "</em></td>" ;
+                html += "<td><a href='customerredact.html' onclick='updatecostomer(" + res.data[o].id+ ")' class='vi-green'><i class='iconfont'>&#xe678;</i>" + "编辑" + "</a><em class='abe-space'></em><a href='#' onclick='deletecostomer(" + res.data[o].id + ")' class='abe-red'><i class='iconfont'>&#xe70d;</i>" + "删除" + "</a></td>";
+                html += "</tr>";
+                $("#customerlist").append(html);
+            }
+        }, 'json');
+    }
+
+    function compare(property) {
+        return function(a, b) {
+            var value1 = a[property];
+            var value2 = b[property];
+            return value1 - value2;
+        }
+    }
+
+
+    //修该一个会员信息（根据id）
+    function updatecostomer(res) {
+        window.localStorage.setItem("id", res);
+    }
+
+    //删除会员根据id
+    function deletecostomer(res) {
+        if (confirm("确实要删除吗？")) {
+
+            //var data = {ids: res};
+            map.ids=res;
+            var sign= $.md5(jsonSort(map)+token+time+time);
+            map.sign=sign.toUpperCase();
+            $.ajax({
+                url: path + "/v1/customer/dele",
+                type: "GET",
+                data: map,
+                dataType: "json",
+                success: function (result) {
+                    if (result.code == 0) {
+                        confirm("删除成功");
+                        location.reload();
+                    } else {
+                        confirm(result.msg);
+                    }
+                }
+            });
+        } else {
+            alert("已经取消了删除操作");
+        }
+    }
+
+
+</script>
+
+
+<body >
+
+<header class="inhead-box" >
+    <div class="inhead"><a href="#" class="logo abe-fl">人脸识别系统</a>
+        <div class="user-info abe-fr"><span><em class="vi-green">admin</em>，您好！ </span> <a href="#" class="uhead"><img
+                src="images/user_head.jpg" alt=""></a></div>
+        <nav class="abe-fr"><a href="customermanage.html" class="active">会员管理</a><a href="dataanalysis.html">数据分析</a><a href="aishow.html">AI显示</a><a
+                href="systemsettings.html">系统设置</a><a href="extendmodule.html">扩展模块</a></nav>
+    </div>
+</header>
+<div class="blank20"></div>
+<div class="main">
+    <div class="menu abe-fl">
+        <h1 class="title"><a href="index.html"><i class="iconfont abe-ft24 mrg_10">&#xe601;</i>回首页</a></h1>
+        <ul>
+            <li class="active"><a href="customermanage.html"><i class="iconfont">&#xe73c;</i>会员管理</a></li>
+            <li><a href="informationpush.html"><i class="iconfont">&#xe600;</i>信息推送</a></li>
+            <li><a href="othersettings.html"><i class="iconfont">&#xe660;</i>其他设置</a></li>
+        </ul>
+    </div>
+    <div class="content abe-fr">
+        <div class="local"> 当前位置<em class="abe-space">&gt;</em><span class="abe-gray3">会员管理</span> <a style="float: right" href='http://localhost:8090/yy-face/test/export' class='vi-green'><i class='iconfont'>&#xe678;</i>导出会员</a></div>
+        <div class="table-box">
+            <table width="100%" border="1" class="user-tb">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>会员名</th>
+                    <th>会员等级</th>
+                    <th>手机号码</th>
+                    <th>兴趣</th>
+                    <th>标签</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+
+                <tbody id="customerlist">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="abe-page course-list-page pdt_30 pdb_30">
+            <ul class="abe-pagination admin-content-pagination" id="lilist"></ul>
+        </div>
+    </div>
+</div>
+<div class="icp">Copyright © 2006 - 2015 人脸识别系统版权所有 沪ICP备 0000001号</div>
+</body>
+</html>

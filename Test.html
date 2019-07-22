@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/echarts.min.js"></script>
+    <script type="text/javascript" src="js/path.js"></script>
+    <script type="text/javascript" src="js/md5.js"></script>
+    <script>
+
+        $(function () {
+
+
+            map.dc=
+            var sign= $.md5(jsonSort(map)+token+time+time);
+            map.sign=sign.toUpperCase();
+            console.log(sign);
+
+            /*查出根据性别的统计*/
+            $.get(path + "/v1/statistical/day", map, function (res) {
+
+
+            },"json");
+
+
+
+
+        });
+
+
+    </script>
+
+
+</head>
+<body>
+
+<input type="date"  id="date" onchange="date()">
+
+</body>
+</html>

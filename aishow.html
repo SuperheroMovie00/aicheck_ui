@@ -1,0 +1,978 @@
+<!doctype html>
+<html>
+<head>
+
+    <!--ai显示-->
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>AI</title>
+    <link type="text/css" rel="stylesheet" href="style/reset.css">
+    <link type="text/css" rel="stylesheet" href="style/index.css">
+    <link type="text/css" rel="stylesheet" href="style/swiper.min.css">
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/path.js"></script>
+    <script type="text/javascript" src="js/md5.js"></script>
+
+    <script>
+
+
+        var groupid = 0;
+        var strategyType;
+        var strategyid;
+        var equipmentnames = new Array();
+        var src;
+        var sign = "";
+
+
+        $(function () {
+            ////map=initmap;
+            //console.log(initmap);
+            querygroup();
+        });
+
+        //获取所有的分组
+        function querygroup() {
+            //显示所有的分组
+            $("#grouplist").html("");
+
+            $("#grouplist").append(
+                "<li class='item'>" +
+                "<div class='atop'><img src='images/bg/slide.png' alt=''><span><em class='abe-fl'>" + "默认分组"  + "</em><em class='abe-fr'>" + "设备数量" + "</em></span></div>" +
+                "<div class='abottom'><a href='#' class='btn' onclick='defaultupdategrouping()'><i class='iconfont'>" + "</i>" + "编辑" + "</a> "+
+                "</li>"
+            );
+
+            var sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.get(path + "/v1/image-group", map, function (res) {
+                for (var groupnum = 0; groupnum < res.data.length; groupnum++) {
+                    $("#grouplist").append(
+                        "<li class='item'>" +
+                        "<div class='atop'><img src='images/bg/slide.png' alt=''><span><em class='abe-fl'>" + "分组：" + res.data[groupnum].name + "</em><em class='abe-fr'>" + "设备数量：" + res.data[groupnum].strategy + "</em></span></div>" +
+                        "<div class='abottom'><a href='#' class='btn' onclick='updategrouping(" + res.data[groupnum].id + ")'><i class='iconfont'>" + "</i>" + "编辑" + "</a><a href='#' class='btn btn-red' onclick='deletegrouping(" + res.data[groupnum].id + ")'><iclass='iconfont'>" + "</i>" + "删除" + "</a></div>" +
+                        "</li>"
+                    );
+                }
+                $("#grouplist").append("<li class='item add' onclick='addgrouping()'><a href='#'><i class='iconfont'>&#xe603;</i></a></li>");
+            }, 'json');
+        }
+
+
+        /*点击分组类型的时候触发（为智能AI的时候显示其他的，为其他的时候隐藏）*/
+        function type() {
+            if ($("#group_type").val() == 1) {
+                $("#type").show();
+            } else {
+                $("#type").hide();
+            }
+        }
+
+        //点击新增分组的方法
+        function addgrouping() {
+            $("#addgrouping").show();
+        }
+
+        //新增分组保存
+        function addsubmitgrouping() {
+            console.log(map);
+
+            map.name = $("#name").val();
+            map.groupType = $("#group_type").val();
+            map.strategyType = $("#strategy_type").val();
+            map.dataType = $("#data_type").val();
+            var  sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.post(path + "/v1/image-group/addimageGroup", map
+
+
+                , function (res) {
+                    if (res.code == 0) {
+                        confirm("新增成功");
+                        querygroup();
+                        $("#addgrouping").hide();
+                    } else {
+                        confirm("新增失败");
+                    }
+                }, 'json');
+
+        }
+
+        //关闭新增分组的窗口
+        function closeaddgrouping() {
+            $("#addgrouping").hide();
+        }
+
+
+        //设置默认分组资源窗口
+       function defaultupdategrouping(){
+           $("#defaultupdategrouping").show();
+
+           var  sign = $.md5(jsonSort(map) + token + time + time);
+           map.sign = sign.toUpperCase();
+           $("#defaultresourcenewer").html("");
+            $.get(path + "/v1/advertising-images/qyeryadvertisingimagesforgroupidwherezero",map,function (res) {
+
+                $("#defaultresourcenewer").append("<label for='' class='up-proimg abe-fl'>" +
+                    "<input type='file' id='defaultfilevaler' onchange='defaultsubmitstrategyer(this)'>" +
+                    "<i class='iconfont'>&#xe603;</i> </label>"
+                );
+                for (var c = 0; c < res.data.length; c++) {
+                    $("#defaultresourcenewer").append(
+                        "<div class='proimg'><a href='#' class='close iconfont' onclick='defaultdeleteadviceimage(" + res.data[c].id + ")' >&#xe602;</a> <img src='" + res.data[c].url + "' alt=''></div>"
+                    )
+                }
+            },"json");
+       }
+
+
+        function defaultsubmitstrategyer(file){
+
+            var imagep=$("#defaultfilevaler").val();
+            var formData = new FormData();
+            formData.append("file", $("#defaultfilevaler")[0].files[0]);
+            formData.append("timestamp", time);
+            formData.append("nonce", time);
+            formData.append("token", token);
+            var sign = $.md5( token + time + time);
+
+
+            formData.append("sign", sign.toUpperCase());
+            $.ajax({
+                url: path + "/v1/customer/upload/visitors",
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+
+                    var sign1 = $.md5(jsonSort( {
+                        timestamp:time,
+                        nonce:time,
+                        token:token,
+                        url:data.data,
+                        image:imagep,
+                        type:1,
+                        sort:1,
+                    })+ token + time + time);
+
+
+                    $.post(path + "/v1/advertising-images/defaultaddadvertisingimages",
+                        {
+                            timestamp:time,
+                            nonce:time,
+                            token:token,
+                            url:data.data,
+                            image:imagep,
+                            type:1,
+                            sort:1,
+                            sign:sign1.toUpperCase(),
+                        }
+                        , function (res) {
+                            if (res.code == 0) {
+                                confirm("添加资源成功");
+                                //刷新图片
+                                defaultupdategrouping();
+
+                            } else {
+                                confirm("添加资源失败");
+                            }
+                        }, "json");
+                }
+            });
+
+        }
+
+
+       //设置默认分组资源窗口关闭
+       function defaultclosewin() {
+           $("#defaultupdategrouping").hide();
+       }
+
+
+
+        //修改分组的信息
+        function updategrouping(index) {
+
+
+            groupid = index;
+            $("#mask").show();
+            $("#updategrouping").show();
+
+            //显示分组的基本信息**********************//
+            querygroupforid(index);
+            //alert(equipmentnames);
+            //显示所在分组所有的策略***********************//
+            querystrategybycustomerid(index);
+
+
+        }
+
+
+        function querygroupimage(index) {
+            /*获取资源*/
+            $("#resourcenewer").html("");
+
+            var sign= $.md5(jsonSort({
+                groupid:index,
+                timestamp:time,
+                nonce:time,
+                token:token,
+            })+token+time+time);
+
+            $.post(path + "/v1/advertising-images/advertisingImagesforgroupid", {
+                groupid:index,
+                timestamp:time,
+                nonce:time,
+                token:token,
+                sign:sign.toUpperCase(),
+            }
+            , function (res) {
+                $("#resourcenewer").append("<label for='' class='up-proimg abe-fl'>" +
+                    "<input type='file' id='filevaler' onchange='submitstrategyer(this)'>" +
+                    "<i class='iconfont'>&#xe603;</i> </label>"
+                )
+                for (var c = 0; c < res.data.length; c++) {
+                    $("#resourcenewer").append(
+                        "<div class='proimg'><a href='#' class='close iconfont' onclick='deleteadviceimage(" + res.data[c].id + ")' >&#xe602;</a> <img src='" + res.data[c].url + "' alt=''></div>"
+                    )
+                }
+            }, "json");
+        }
+
+
+        //显示分组的基本信息**********************//
+        function querygroupforid(index) {
+
+
+
+           var sign1 = $.md5(jsonSort({
+                id: index,
+                timestamp: time,
+                nonce: time,
+                token: token,
+            }) + token + time + time);
+
+
+            $.get(path + "/v1/image-group/findById",
+                {
+                    id: index,
+                    timestamp: time,
+                    nonce: time,
+                    token: token,
+                    sign:sign1.toUpperCase(),
+                }, function (res) {
+                    document.getElementById("ccc").innerHTML = res.data.name;
+                    strategyType = res.data.strategyType;
+                    if (res.data.strategyType == 0) {
+                        $("#strategydiv").hide();
+                        $("#extenddiv").show();
+                        querygroupimage(index);
+                    }
+
+                    if (res.data.strategyType == 1) {
+                        $("#sex").show();
+                        $("#age").hide();
+                        $("#tags").hide();
+                        $("#strategydiv").show();
+                        $("#extenddiv").hide();
+                    }
+                    if (res.data.strategyType == 2) {
+                        $("#age").show();
+                        $("#tags").hide();
+                        $("#sex").hide();
+                        $("#strategydiv").show();
+                        $("#extenddiv").hide();
+                    }
+                    if (res.data.strategyType == 3) {
+                        $("#tags").html("");
+
+                       var sign2 = $.md5(jsonSort( {
+                           timestamp: time,
+                           nonce: time,
+                           token: token,
+                       }) + token + time + time);
+
+                        $.get(path + "/v1/tags",
+                            {
+                                timestamp: time,
+                                nonce: time,
+                                token: token,
+                                sign:sign2.toUpperCase(),
+                            }, function (res) {
+                                $("#tags").append("<option>" + "请选择" + "</option>");
+                                for (var c = 0; c < res.data.length; c++) {
+                                    $("#tags").append("<option>" + res.data[c].name + "</option>");
+                                }
+                            }, "json");
+                        $("#tags").show();
+                        $("#sex").hide();
+                        $("#age").hide();
+                        $("#strategydiv").show();
+                        $("#extenddiv").hide();
+                    }
+
+//显示该分组所有的机器**************************//
+                    var platform;
+                    /*查询分组可选的设备，（当分组为智能AI的时候，显示平台为AI的设备。。。。）*/
+                    if (res.data.groupType == 1) {
+                        platform = "ai";
+                    }
+                    if (res.data.groupType == 2) {
+                        platform = "box";
+                    }
+                    if (res.data.groupType == 0) {
+                        platform = " ";
+                    }
+
+                    $("#device").html("");
+
+                    //map.platform = platform;
+                    var sign3 = $.md5(jsonSort({
+                        timestamp: time,
+                        nonce: time,
+                        token: token,
+                        platform: platform,
+                    }) + token + time + time);
+
+                    $.get(path + "/v1/device",
+                        {
+                            timestamp: time,
+                            nonce: time,
+                            token: token,
+                            platform: platform,
+                            sign:sign3.toUpperCase(),
+                        }
+                        , function (res) {
+                            $("#device").append("<option>" + "请选择" + "</option>");
+                            for (var c = 0; c < res.data.length; c++) {
+                                if (!equipmentnames.includes(res.data[c].name)) {
+                                    $("#device").append("<option>" + res.data[c].name + " " + res.data[c].ipAddress + "</option>"
+                                    );
+                                }
+                            }
+                        }, "json");
+//显示该分组所有的机器**************************//
+
+
+                    //将机器数据取到
+                    if (res.data.deviceShow != "") {               //此分组信息中机器不为空的情况
+                        var device = res.data.deviceShow;
+                        var chars = new Array();
+                        var string = device.trim().split("|");//先将数据按照“|”截开
+                        $("#devicelist").html("");
+                        for (var c = 0; c < string.length; c++) {
+                            var char = string[c].trim().split(",");//再将截开的数据按照“,”截开
+                            equipmentnames[c] = char[0];
+
+                            //将此分组拥有的机器便利在页面上
+                            $("#devicelist").append(
+                                "<li><a href='#' class='del' onclick='deleteequipment(" + c + ")'><i class='iconfont mrg_5'>&#xe602</i>" + "删除" + "</a>" +
+                                "<h1>" + char[0] + "</h1>" +
+                                "<p>" + "Ip:" + char[1] + "</p>" +
+                                "</li>"
+                            );
+                        }
+                    } else {
+                        $("#devicelist").html("");
+                    }
+                }, "json");
+        }
+
+        //显示分组的基本信息**********************//
+
+        //显示该分组所有的机器**************************//
+
+
+        //显示所在分组所有的策略***********************//
+        function querystrategybycustomerid(index) {
+            $("#strategylist").html("");
+
+            //map.groupid = index;
+           var sign = $.md5(jsonSort({
+                timestamp: time,
+                nonce: time,
+                token: token,
+                groupid: index,
+            }) + token + time + time);
+
+
+            $.post(path + "/v1/image-strategy/querystrategyforcusid",
+                {
+                    timestamp: time,
+                    nonce: time,
+                    token: token,
+                    sign:sign.toUpperCase(),
+                    groupid: index,
+                }, function (res) {
+                    for (var c = 0; c < res.data.length; c++) {
+                        $("#strategylist").append(
+                            "<li>" +
+                            "<h1>" + res.data[c].name + "</h1>" +
+                            "<div><a href='#' class='btn' onclick='updatestrategy(" + res.data[c].id + ")'><i class='iconfont'>&#xe678;</i>" + "编辑" + "</a><a href='#' class='btn btn-red' onclick='deletestrategy(" + res.data[c].id + ")'><i class='iconfont'>&#xe602;</i>" + "删除" + "</a></div>" +
+                            "</li>"
+                        );
+                    }
+                }, "json");
+        }
+
+        //显示所在分组所有的策略***********************//
+
+
+        //修改策略（配置资源）
+        function updatestrategy(index) {
+            strategyid = index;
+            $("#resource").show();
+
+            map.id = index;
+           var  sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.post(path + "/v1/image-strategy/findbyid",
+                map
+                , function (res) {
+                document.getElementById("strategyname").innerHTML = res.data.name;
+            }, "json");
+
+            queryresource(index)
+
+        }
+
+
+        function queryresource(index) {
+            /*获取资源*/
+            $("#resourcenew").html("");
+
+            //map.strategyid=index;
+           var sign = $.md5(jsonSort({strategyid: index}) +token + time + time);
+
+            $.post(path + "/v1/advertising-images/advertisingImagesRepository", {
+                timestamp: time,
+                nonce: time,
+                token: token,
+                strategyid: index,
+                sign:sign.toUpperCase(),
+            }, function (res) {
+                $("#resourcenew").append("<label for='' class='up-proimg abe-fl'>" +
+                    "<input type='file' id='fileval' onchange='submitstrategy(this)'>" +
+                    "<i class='iconfont'>&#xe603;</i> </label>"
+                )
+                for (var c = 0; c < res.data.length; c++) {
+                    $("#resourcenew").append(
+                        "<div class='proimg'><a href='#' class='close iconfont' onclick='deleteadviceimage(" + res.data[c].id + ")' >&#xe602;</a> <img src='" + res.data[c].url + "' alt=''></div>"
+                    )
+                }
+            }, "json");
+        }
+
+        //修改分组保存
+        function submitstrategy(file) {
+
+            var imagep=$("#fileval").val();
+            var formData = new FormData();
+            formData.append("file",$("#fileval")[0].files[0]);
+            console.log($("#fileval").val());
+            formData.append("timestamp", time);
+            formData.append("nonce", time);
+            formData.append("token", token);
+            var sign = $.md5( token + time + time);
+            formData.append("sign", sign.toUpperCase());
+            $.ajax({
+                url: path + "/v1/customer/upload/visitors",
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+
+                    var sign1 = $.md5(jsonSort( {
+                        timestamp:time,
+                        nonce:time,
+                        token:token,
+                        url:data.data,
+                        strategy_id:strategyid,
+                        image:imagep,
+                        type:1,
+                        sort:1,
+                        groupId:groupid,
+                    }) + token + time + time);
+
+                    $.post(path + "/v1/advertising-images/addadvertisingimages",
+                        {
+                            timestamp:time,
+                            nonce:time,
+                            token:token,
+                            url:data.data,
+                            strategy_id:strategyid,
+                            image:imagep,
+                            type:1,
+                            sort:1,
+                            groupId:groupid,
+                            sign:sign1.toUpperCase(),
+                        }
+                        , function (res) {
+                        if (res.code == 0) {
+
+                            confirm("添加资源成功");
+                            //刷新图片 （策略中的）
+                            queryresource(strategyid);
+
+                        } else {
+                            confirm("添加资源失败");
+                        }
+                    }, "json");
+                }
+            });
+        }
+
+        //修改分组保存
+        function submitstrategyer(file) {
+
+            var imagep=$("#filevaler").val();
+            var formData = new FormData();
+            formData.append("file", $("#filevaler")[0].files[0]);
+            formData.append("timestamp", time);
+            formData.append("nonce", time);
+            formData.append("token", token);
+            map.file = $("#filevaler")[0].files[0];
+            var sign = $.md5( token + time + time);
+            formData.append("sign", sign.toUpperCase());
+            $.ajax({
+                url: path + "/v1/customer/upload/visitors",
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+
+                    var sign1 = $.md5(jsonSort( {
+                        timestamp:time,
+                        nonce:time,
+                        token:token,
+                        url:data.data,
+                        image:imagep,
+                        type:1,
+                        sort:1,
+                        groupId:groupid,
+                    })+ token + time + time);
+
+
+
+                    $.post(path + "/v1/advertising-images/addadvertisingimages",
+                        {
+                            timestamp:time,
+                            nonce:time,
+                            token:token,
+                            url:data.data,
+                            image:imagep,
+                            type:1,
+                            sort:1,
+                            groupId:groupid,
+                            sign:sign1.toUpperCase(),
+                        }
+                        , function (res) {
+                        if (res.code == 0) {
+                            confirm("添加资源成功");
+                            //刷新图片
+                            querygroupimage(groupid);
+
+                        } else {
+                            confirm("添加资源失败");
+                        }
+                    }, "json");
+                }
+            });
+        }
+
+
+        //删除策略中的图片资源
+        function deleteadviceimage(index) {
+
+
+            map.id = index;
+            var  sign = $.md5(jsonSort(map) + token + time + time);
+
+            map.sign = sign.toUpperCase();
+            $.post(path + "/v1/advertising-images/deleteadviceimage", map /*{
+                id: index,
+            }*/, function (res) {
+                if (res.code == 0) {
+                    confirm("删除资源成功");
+                    //刷新图片
+                    queryresource(strategyid);
+                    querygroupimage(groupid);
+
+                } else {
+                    confirm("删除资源失败");
+                }
+            }, "json");
+
+        }
+
+
+        //修改策略取消 （关闭窗口）
+        function closeresource() {
+            $("#resource").hide();
+        }
+
+
+        //修改分组提交
+        function submitgrouping() {
+
+        }
+
+
+        //添加设备
+        function addequipment() {
+            alert("dsafd");
+
+            map.groupid = groupid;
+            map.device = $("#device").val();
+            var  sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.post(path + "/v1/image-group/updateimagegroup", map, function (res) {
+                if (res.code == 0) {
+                    querygroupforid(groupid);
+                    $("#device").val("");
+                } else {
+                    querygroupforid(groupid);
+                }
+
+            }, "json");
+
+        }
+
+        //删除设备
+        function deleteequipment(index) {
+
+            map.groupid = groupid;
+            map.index = index+1;
+            var  sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            console.log(jsonSort(map) + token + time + time);
+            $.post(path + "/v1/image-group/updateimagegrouper", map , function (res) {
+                if (res.code == 0) {
+                    confirm("删除机器成功");
+                    querygroupforid(groupid);
+                } else {
+                    confirm("删除机器失败");
+                    querygroupforid(groupid);
+                }
+            }, "json");
+        }
+
+        //删除策略
+        function deletestrategy(index) {
+
+            map.id = index;
+            var  sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.post(path + "//v1/image-strategy/deletestrategy", map /*{
+                id: index,
+            }*/, function (res) {
+                if (res.code == 0) {
+                    confirm("删除策略成功");
+                    querystrategybycustomerid(groupid);
+                } else {
+                    confirm("删除策略失败");
+                }
+            }, "json");
+        }
+
+        //为分组中添加策略添加策略
+        function addstrategy() {
+            var strategy;
+            switch (strategyType) {
+                case 1:
+                    strategy = $("#sex").val();
+                    break;
+                case 2:
+                    strategy = $("#age").val();
+                    break;
+                case 3:
+                    strategy = $("#tags").val();
+                    break;
+            }
+
+            map.group_id = groupid;
+            map.name = $("#strategynae").val();
+            map.strategy = strategy;
+           var  sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.post(path + "/v1/image-strategy/addstrategy", map/* {
+                group_id: groupid,
+                name: $("#strategynae").val(),
+                strategy: strategy,
+            }*/, function (res) {
+                if (res.code == 0) {
+                    querystrategybycustomerid(groupid);
+                    $("#strategynae").val("");
+                    $("#sex").val("");
+                    $("#age").val("");
+                    $("#tags").val("");
+                } else {
+
+                }
+            }, "json");
+        }
+
+        //关闭修改分组的窗口
+        function closegrouping() {
+            $("#updategrouping").hide();
+            $("#mask").hide();
+        }
+
+        //删除分组
+        function deletegrouping(index) {
+            if (confirm("确实要删除吗？")) {
+                //删除操作
+
+                map.id = index;
+               var  sign = $.md5(jsonSort(map) + token + time + time);
+                map.sign = sign.toUpperCase();
+                $.post(path + "/v1/image-group/deletegroup", map /*{
+                    id: index,
+                }*/, function (res) {
+                    if (res.code == 0) {
+                        confirm("删除成功");
+                        querygroup();
+                    } else {
+                        confirm("删除失败");
+                    }
+                }, "json");
+            } else {
+                alert("已经取消了删除操作");
+            }
+        }
+
+
+    </script>
+</head>
+
+<body>
+<header class="inhead-box">
+    <div class="inhead"><a href="#" class="logo abe-fl">人脸识别系统</a>
+        <div class="user-info abe-fr"><span><em class="vi-green">admin</em>，您好！ </span> <a href="#" class="uhead"><img
+                src="images/user_head.jpg" alt=""></a></div>
+        <nav class="abe-fr"><a href="customermanage.html">会员管理</a><a href="dataanalysis.html">数据分析</a><a
+                href="aishow.html" class="active">AI显示</a><a
+                href="systemsettings.html">系统设置</a><a href="extendmodule.html">扩展模块</a></nav>
+    </div>
+</header>
+<div class="blank20"></div>
+<div class="ucbox">
+    <div class="local"> 当前位置<em class="abe-space">&gt;</em><span class="abe-gray3">AI显示</span></div>
+
+    <ul class="ai-list" id="grouplist"></ul>
+
+
+</div>
+<div class="icp">Copyright © 2006 - 2015 人脸识别系统版权所有 沪ICP备 0000001号</div>
+<div class="popup-win oper-pop" style="display:none ">
+    <div class="pop-tit abe-ofl"><span class="abe-fl tit">操作提示！</span> <a href="#" class="close iconfont abe-fr">&#xe602;</a>
+    </div>
+    <div class="oper-info">
+        <div><i class="iconfont abe-red">&#xe614;</i><span>合同号码不能为空！</span></div>
+        <div><i class="iconfont vi-green">&#xe615;</i><span>操作成功！</span></div>
+        <div><i class="iconfont abe-red">&#xe616;</i><span>合同号码不能为空！</span></div>
+        <p>操作描述详情</p>
+        <div class="abe-txtc pdt_20">
+            <input type="button" class="vi-btn-green mrg_20" value="确定">
+            <input type="button" class="vi-btn-gray" value="取消">
+        </div>
+    </div>
+</div>
+
+
+<!--创建分组-->
+<div class="popup-win group-pop" style="display: none" id="addgrouping">
+    <div class="pop-tit abe-ofl"><span class="abe-fl tit">添加分组</span> <a href="#" class="close iconfont abe-fr"
+                                                                         onclick="closeaddgrouping()">&#xe602;</a></div>
+    <ul class="user-form-ul pdl_40" style="display: ">
+        <li><span>分组名称<i class="abe-red"></i></span></li>
+        <li>
+            <input type="text" id="name" class="text">
+        </li>
+        <li><span>分组类型<i class="abe-red"></i></span></li>
+        <li>
+            <select id="group_type">
+                <option onclick="type()" value="0">请选择</option>
+                <option onclick="type()" value="1">AI智能</option>
+                <option onclick="type()" value="2">普通</option>
+            </select>
+        </li>
+
+        <div id="type" style="display: none">
+            <li><span>选择策略<i class="abe-red"></i></span></li>
+            <li>
+                <select id="strategy_type">
+                    <option value="0">请选择</option>
+                    <option value="1">性别策略</option>
+                    <option value="2">年龄策略</option>
+                    <option value="3">标签策略</option>
+                </select>
+            </li>
+            <li><span>选择资源<i class="abe-red"></i></span></li>
+            <li>
+                <select id="data_type">
+                    <option value="0">请选择</option>
+                    <option value="1">图片</option>
+                    <option value="2">视频</option>
+                </select>
+            </li>
+        </div>
+    </ul>
+    <div class="pop-sub">
+        <input type="button" class="vi-btn-green mrg_20" onclick="addsubmitgrouping()" value="确定">
+        <input type="button" class="vi-btn-gray" onclick="closeaddgrouping()" value="取消">
+    </div>
+</div>
+
+
+<!--创建分组 结束-->
+<!--创建分组-->
+<div class="popup-win group-pop" style="display: none" id="updategrouping">
+    <div class="pop-tit abe-ofl"><span class="abe-fl tit"><span id="ccc"></span><em class="abe-space">-</em>分组配置</span>
+        <a href="#"
+           onclick="closegrouping()"
+           class="close iconfont abe-fr">&#xe602;</a>
+    </div>
+    <div class="pop-info">
+        <dl class="addg-box">
+            <dt>推送设备</dt>
+            <dd>
+                <div class="item">
+                    <ul class="sb-list" id="devicelist"></ul>  <!--所有机器在这-->
+                </div>
+                <div class="item pdt_20">
+                    <select class="pbsele" id="device"></select>
+                    <input type="button" class="vi-btn-green mlg_10" onclick="addequipment()" value="添加设备">
+                </div>
+            </dd>
+
+            <div id="strategydiv">
+                <dt>创建策略</dt>
+                <dd class="clearfix">
+                    <div class="item">
+                        <ul class="sb-list cl-ul" id="strategylist"></ul>
+                        <ul class="user-form-ul cl-from" style="display: ">
+
+                            <li><span>策略名称<i class="abe-red"></i></span></li>
+                            <li>
+                                <input type="text" class="text" id="strategynae" style="width: 200px">
+                            </li>
+
+
+                            <li><span>策略值<i class="abe-red"></i></span></li>
+                            <li>
+                                <select class="p48 abe-fl" style="display: none" id="sex">
+                                    <option value="">请选择</option>
+                                    <option value="男">男</option>
+                                    <option value="女">女</option>
+                                </select>
+
+                                <select class="p48 abe-fl" style="display: none" id="age">
+                                    <option value="">请选择</option>
+                                    `
+                                    <option value="0~12">少儿（0~12）</option>
+                                    <option value="13~18">青年（13~18）</option>
+                                    <option value="19~30">壮年（19~30）</option>
+                                    <option value="31~50">中年（31~50）</option>
+                                    <option value="51~70">中老年（51~70）</option>
+                                    <option value="70+">老年（70+）</option>
+                                </select>
+
+                                <select class="p48 abe-fl" style="display: none" id="tags"></select>
+                            </li>
+                            <li class="pdt_10"><input type="button" class="vi-btn-green mrg_10" onclick="addstrategy()"
+                                                      value="添加策略">
+                                <input type="button" class="vi-btn-gray" value="重置"></li>
+                        </ul>
+                    </div>
+                </dd>
+            </div>
+
+            <div id="extenddiv">
+                <dt>选择资源</dt>
+                <dd class="clearfix">
+                    <div class="up-zy" id="resourcenewer"></div>
+                </dd>
+
+            </div>
+
+        </dl>
+    </div>
+    <div class="pop-sub">
+<!--        <input type="button" class="vi-btn-green mrg_20" onclick="submitgrouping()" value="确定">-->
+        <input type="button" class="vi-btn-green mrg_20" onclick="closegrouping()" value="确定">
+        <input type="button" class="vi-btn-gray" onclick="closegrouping()" value="取消">
+    </div>
+</div>
+
+
+<div class="popup-win group-pop" style="display: none;border: #bab8b8 solid 1px" id="resource">
+
+    <div class="pop-tit abe-ofl"><span class="abe-fl tit"><span id="strategyname"></span><em class="abe-space">-</em>策略配置</span>
+        <a href="#"
+           onclick="closeresource()"
+           class="close iconfont abe-fr">&#xe602;</a>
+    </div>
+    <dl>
+        <dt>选择资源</dt>
+        <dd class="clearfix">
+            <div class="up-zy" id="resourcenew"></div>
+        </dd>
+    </dl>
+
+    <div class="pop-sub">
+        <input type="button" class="vi-btn-green mrg_20" onclick="closeresource()" value="确定">
+        <input type="button" class="vi-btn-gray" onclick="closeresource()" value="取消">
+    </div>
+</div>
+
+
+
+<div class="popup-win group-pop" style="display: none" id="defaultupdategrouping">
+    <div class="pop-tit abe-ofl"><span class="abe-fl tit">默认<em class="abe-space">-</em>默认分组配置</span>
+        <a href="#"
+           onclick="defaultclosewin()"
+           class="close iconfont abe-fr">&#xe602;</a>
+    </div>
+    <div class="pop-info">
+        <dl class="addg-box">
+
+            <div id="defaultextenddiv">
+                <dt>选择资源</dt>
+                <dd class="clearfix">
+                    <div class="up-zy" id="defaultresourcenewer"></div>
+                </dd>
+
+            </div>
+
+        </dl>
+    </div>
+    <div class="pop-sub">
+        <input type="button" class="vi-btn-green mrg_20" onclick="defaultclosewin()" value="确定">
+        <input type="button" class="vi-btn-gray" onclick="defaultclosewin()" value="取消">
+    </div>
+</div>
+
+
+
+
+
+
+<!--创建分组 结束-->
+<div class="popup-bg" style="display:none;z-index: 0" id="mask"></div>
+
+<script>
+    $(function () {
+        $(".popup-win").each(function () {
+            var pw = $(this).width() / 2;
+            var ph = $(this).outerHeight() / 2;
+            $(this).css({"margin-left": -pw, "margin-top": -ph})
+        });
+    });
+</script>
+
+</body>
+</html>

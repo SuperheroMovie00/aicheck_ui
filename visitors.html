@@ -1,0 +1,292 @@
+<!doctype html>
+<html>
+<head>
+
+    <!--数据分析-->
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>AI</title>
+    <link type="text/css" rel="stylesheet" href="style/index.css">
+    <link type="text/css" rel="stylesheet" href="style/reset.css">
+    <link type="text/css" rel="stylesheet" href="style/swiper.min.css">
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <!--<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>-->
+    <script type="text/javascript" src="js/echarts.min.js"></script>
+    <script type="text/javascript" src="js/path.js"></script>
+    <script type="text/javascript" src="js/md5.js"></script>
+</head>
+
+<body>
+<header class="inhead-box">
+    <div class="inhead"><a href="#" class="logo abe-fl">人脸识别系统</a>
+        <div class="user-info abe-fr"><span><em class="vi-green">admin</em>，您好！ </span> <a href="#" class="uhead"><img
+                src="images/user_head.jpg" alt=""></a></div>
+        <nav class="abe-fr"><a href="customermanage.html">会员管理</a><a href="dataanalysis.html" class="active">数据分析</a><a href="aishow.html">AI显示</a><a
+                href="systemsettings.html">系统设置</a><a href="extendmodule.html">扩展模块</a></nav>
+    </div>
+</header>
+<div class="blank20"></div>
+<div class="main">
+    <div class="menu abe-fl">
+        <h1 class="title"><a href="index.html"><i class="iconfont abe-ft24 mrg_10">&#xe601;</i>回首页</a></h1>
+        <ul>
+            <li ><a href="dataanalysis.html"><i class="iconfont">&#xe6bb;</i>性别统计</a></li>
+            <li><a href="agestatistics.html"><i class="iconfont">&#xe609;</i>年龄统计</a></li>
+            <li class="active"><a href="visitors.html"><i class="iconfont">&#xe609;</i>客流统计</a></li>
+
+        </ul>
+    </div>
+    <div class="content abe-fr">
+        <div class="local"> 当前位置<em class="abe-space">&gt;</em><span class="abe-gray3">性别统计</span>
+            <div style="float: right">
+                <select id="selectno">
+                    <option value="1">按日</option>
+                    <option value="2">按周</option>
+                    <option value="3">按月</option>
+                </select>
+
+                <input type="date"  id="date" onchange="date()">
+
+
+                <select id="week" style="display: none">
+                    <option value="1">本周</option>
+                    <option value="2">上周</option>
+                </select>
+
+                <select id="month" style="display: none">
+                    <option value="01-01">一月</option>
+                    <option value="02-01">二月</option>
+                    <option value="03-01">三月</option>
+                    <option value="03-01">四月</option>
+                    <option value="05-01">五月</option>
+                    <option value="06-01">六月</option>
+                    <option value="07-01">七月</option>
+                    <option value="08-01">八月</option>
+                    <option value="09-01">九月</option>
+                    <option value="10-01">十月</option>
+                    <option value="11-01">十一月</option>
+                    <option value="12-01">十二月</option>
+                </select>
+
+
+            </div>
+        </div>
+
+
+        <div id="container" style="height:400px"></div>
+
+
+
+
+
+        <script type="text/javascript">
+
+
+            /*查出根据年龄不同分段的统计*/
+            /*进入页面的时候，首先加载统计图*/
+            $(function () {
+                visitors();
+            });
+
+            /*点击分类下拉框的时候重新加载统计图*/
+            $("option").click(function () {
+                visitors();
+            });
+
+            function date(){
+                  //alert( $("#date").val());
+                visitors();
+            }
+            
+
+            /*统计方法*/
+            function visitors() {
+            var dom = document.getElementById("container");
+            var myChart = echarts.init(dom);
+            var app = {};
+            option = null;
+            app.title = '坐标轴刻度与标签对齐';
+            var sign= $.md5(jsonSort(map)+token+time+time);
+            map.sign=sign.toUpperCase();
+            /*查出根据性别的统计*/
+            var Xdata;
+            var countdata;
+            var olddata;
+
+            $.get(path + "/v1/statistical/week", map, function (res) {    //本周
+                    var weekdate=res.data.new.times;
+
+                    var weekcount=res.data.new.counts;
+                    var weekoldcount=res.data.old.counts;
+
+                $.get(path + "/v1/statistical/yesterweek", map, function (res4) {    //本周
+                    var yesterweekdate=res4.data.new.times;
+
+                    var yesterweekcount=res4.data.new.counts;
+                    var yesterweekoldcount=res4.data.old.counts;
+
+
+                    var sign = $.md5(jsonSort( {
+                        timestamp:time,
+                        nonce:time,
+                        token:token,
+                        cc:$("#date").val(),
+                    }) + token + time + time);
+
+                    $.get(path + "/v1/statistical/day",
+                        {
+                            timestamp:time,
+                            nonce:time,
+                            token:token,
+                            cc:$("#date").val(),
+                            sign:sign.toUpperCase(),
+                        }, function (res1) {    // 本天
+                    var daydate=res1.data.new.times;
+                    for (var r=0;r<daydate.length;r++){
+                        daydate[r]=daydate[r]+1;           //将后台处理的0-23的时间段  改为1-24的时间段
+                    }
+                    var daycount=res1.data.new.counts;
+                    var dayoldcount=res1.data.old.counts;
+
+
+
+                        $.get(path + "/v1/statistical/month", map, function (res2) {  // 本月
+
+                    var monthdate=res2.data.new.times;
+                    var monthcount=res2.data.new.counts;
+                    var montholdcount=res2.data.old.counts;
+// date
+                            var sign = $.md5(jsonSort( {
+                                timestamp:time,
+                                nonce:time,
+                                token:token,
+                                date:$("#month").val(),
+                            }) + token + time + time);
+
+                            $.get(path + "/v1/statistical/newmonth",
+
+                                {
+                                    timestamp:time,
+                                    nonce:time,
+                                    token:token,
+                                    date:$("#month").val(),
+                                    sign:sign.toUpperCase(),
+                                }
+
+                                , function (res5) {  // 本月
+
+                                var yestermonthdate=res5.data.new.times;
+                                var yestermonthcount=res5.data.new.counts;
+                                var yestermontholdcount=res5.data.old.counts;
+
+
+
+
+                    if($("#selectno").val()=='1'){
+                            Xdata=daydate;
+                            countdata=daycount;
+                            olddata=dayoldcount;
+                            $("#date").show();
+                            $("#week").hide();
+                            $("#month").hide();
+
+                        }
+                    if($("#selectno").val()=='2'){
+                            Xdata=weekdate;
+                            countdata=weekcount;
+                            olddata=weekoldcount;
+                            $("#date").hide();
+                            $("#week").show();
+                            $("#month").hide();
+                            if($("#week").val()=='2'){
+                                Xdata=yesterweekdate;
+                                countdata=yesterweekcount;
+                                olddata=yesterweekoldcount;
+                            }else{
+                                Xdata=weekdate;
+                                countdata=weekcount;
+                                olddata=weekoldcount;
+                            }
+                        }
+                    if($("#selectno").val()=='3'){
+                            Xdata=monthdate;
+                            countdata=monthcount;
+                            olddata=montholdcount;
+                            $("#date").hide();
+                            $("#month").show();
+                            $("#week").hide();
+                        if($("#month").val()=='2'){
+                            Xdata=yestermonthdate;
+                            countdata=yestermonthcount;
+                            olddata=yestermontholdcount;
+                        }else{
+                            Xdata=monthdate;
+                            countdata=monthcount;
+                            olddata=montholdcount;
+                        }
+                        }
+
+                        option = {
+                    title: {
+                        text: '客流统计'
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data:['总客流量',"会员流量"]
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    toolbox: {
+                        feature: {
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        //data: res.data.new.times,
+                        data:Xdata
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [
+                        {
+                            name:'总客流量',
+                            type:'line',
+                            stack: '总量',
+                            data: countdata,
+                        },
+
+                        {
+                            name:'会员流量',
+                            type:'line',
+                            stack: '总量',
+                            data: olddata,
+                        }
+
+                    ]
+                };
+
+                if (option && typeof option === "object") {
+                    myChart.setOption(option, true);
+                }
+                            }, "json");
+                    }, "json");
+            }, "json");
+            }, "json");
+            }, "json");
+            }
+        </script>
+    </div>
+</div>
+<div class="icp">Copyright © 2006 - 2015 人脸识别系统版权所有 沪ICP备 0000001号</div>
+</body>
+</html>
