@@ -12,18 +12,16 @@
         $(function () {
 
 
-            map.dc=
-            var sign= $.md5(jsonSort(map)+token+time+time);
-            map.sign=sign.toUpperCase();
+
+            var sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
             console.log(sign);
 
             /*查出根据性别的统计*/
-            $.get(path + "/v1/statistical/day", map, function (res) {
+            $.get(path + "/v1/statistical/newyear", map, function (res) {
 
 
-            },"json");
-
-
+            }, "json");
 
 
         });
@@ -35,7 +33,7 @@
 </head>
 <body>
 
-<input type="date"  id="date" onchange="date()">
 
+<font style="font-weight: bold"></font>
 </body>
 </html>

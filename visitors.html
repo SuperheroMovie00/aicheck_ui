@@ -44,6 +44,7 @@
                     <option value="1">按日</option>
                     <option value="2">按周</option>
                     <option value="3">按月</option>
+                    <option value="4">按年</option>
                 </select>
 
                 <input type="date"  id="date" onchange="date()">
@@ -69,15 +70,16 @@
                     <option value="12-01">十二月</option>
                 </select>
 
+                <select id="year" style="display: none">
+                    <option value="1">本年</option>
+                    <option value="2">上年</option>
+                </select>
 
             </div>
         </div>
 
 
         <div id="container" style="height:400px"></div>
-
-
-
 
 
         <script type="text/javascript">
@@ -181,7 +183,18 @@
                                 var yestermontholdcount=res5.data.old.counts;
 
 
+                                    $.get(path + "/v1/statistical/year", map, function (res6) {
 
+                                        var yeardate=res6.data.new.times;
+                                        var yearcount=res6.data.new.counts;
+                                        var yearoldcount=res6.data.old.counts;
+
+
+                                        $.get(path + "/v1/statistical/newyear", map, function (res7) {
+
+                                            var newyeardate=res7.data.new.times;
+                                            var newyearcount=res7.data.new.counts;
+                                            var newyearoldcount=res7.data.old.counts;
 
                     if($("#selectno").val()=='1'){
                             Xdata=daydate;
@@ -190,7 +203,7 @@
                             $("#date").show();
                             $("#week").hide();
                             $("#month").hide();
-
+                        $("#year").hide();
                         }
                     if($("#selectno").val()=='2'){
                             Xdata=weekdate;
@@ -199,6 +212,7 @@
                             $("#date").hide();
                             $("#week").show();
                             $("#month").hide();
+                        $("#year").hide();
                             if($("#week").val()=='2'){
                                 Xdata=yesterweekdate;
                                 countdata=yesterweekcount;
@@ -216,7 +230,8 @@
                             $("#date").hide();
                             $("#month").show();
                             $("#week").hide();
-                        if($("#month").val()=='2'){
+                        $("#year").hide();
+                        if($("#month").val()!=null){
                             Xdata=yestermonthdate;
                             countdata=yestermonthcount;
                             olddata=yestermontholdcount;
@@ -227,7 +242,26 @@
                         }
                         }
 
-                        option = {
+                    if($("#selectno").val()=='4'){
+                        Xdata=yeardate;
+                        countdata=yearcount;
+                        olddata=yearoldcount;
+                        $("#date").hide();
+                        $("#month").hide();
+                        $("#week").hide();
+                        $("#year").show();
+                        if($("#year").val()=='2'){
+                            Xdata=newyeardate;
+                            countdata=newyearcount;
+                            olddata=newyearoldcount;
+                        }else{
+                            Xdata=yeardate;
+                            countdata=yearcount;
+                            olddata=yearoldcount;
+                        }
+                        }
+
+                   option = {
                     title: {
                         text: '客流统计'
                     },
@@ -280,6 +314,8 @@
                 }
                             }, "json");
                     }, "json");
+            }, "json");
+            }, "json");
             }, "json");
             }, "json");
             }, "json");
