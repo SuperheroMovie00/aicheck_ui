@@ -1,4 +1,4 @@
-path="http://localhost:9090/yy-face";
+path="http://localhost:9090/aicheck-face";
 
 var time=new Date().getTime();
 var token="297e325a66f62bae0166f631b0b20002";

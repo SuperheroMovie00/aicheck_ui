@@ -14,6 +14,7 @@
     <script type="text/javascript" src="js/echarts.min.js"></script>
     <script type="text/javascript" src="js/path.js"></script>
     <script type="text/javascript" src="js/md5.js"></script>
+    <script type="text/javascript" src="js/date.js"></script>
 </head>
 
 <body>
@@ -84,9 +85,12 @@
         <script type="text/javascript">
 
 
+
             /*查出根据年龄不同分段的统计*/
             /*进入页面的时候，首先加载统计图*/
             $(function () {
+                var time1 = new Date().Format("yyyy-MM-dd");
+                $("#date").val(time1);
                 visitors();
             });
 
@@ -96,7 +100,6 @@
             });
 
             function date(){
-                  //alert( $("#date").val());
                 visitors();
             }
             
@@ -128,6 +131,7 @@
                     var yesterweekoldcount=res4.data.old.counts;
 
 
+                    console.log($("#date").val());
                     var sign = $.md5(jsonSort( {
                         timestamp:time,
                         nonce:time,
