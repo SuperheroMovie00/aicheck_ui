@@ -55,8 +55,14 @@
                     <option value="2">上周</option>
                 </select>
 
+
+                <select id="yearlist" style="display: none">
+
+
+                </select>
+
                 <select id="month" style="display: none">
-                    <option value="01-01">一月</option>
+                    <!--<option value="2019-01-01">一月</option>
                     <option value="02-01">二月</option>
                     <option value="03-01">三月</option>
                     <option value="03-01">四月</option>
@@ -67,7 +73,7 @@
                     <option value="09-01">九月</option>
                     <option value="10-01">十月</option>
                     <option value="11-01">十一月</option>
-                    <option value="12-01">十二月</option>
+                    <option value="12-01">十二月</option>-->
                 </select>
 
                 <select id="year" style="display: none">
@@ -84,25 +90,115 @@
 
         <script type="text/javascript">
 
-
+            var value=null;
+            var yearvalue=2019;
 
             /*查出根据年龄不同分段的统计*/
             /*进入页面的时候，首先加载统计图*/
             $(function () {
+                //当前年份
+                /**
+                 * 将当前年到2019年 取出渲染到选择框中
+                 **/
+                var yearnum = new Date().Format("yyyy");
+                var monthnum = new Date().Format("MM");     //默认开始时间为2019-7
+                $("#yearlist").html("");
+                for (var i=0;i<=yearnum-2018;i++){
+                    var year=2018+i;
+                    $("#yearlist").append(
+                        "<option onclick='yearchenge("+year+")' value='"+year+"'>"+year+"</option>"
+                    )
+                };
+
+                var newdate = new Date().Format("yyyy-MM-dd");
+                value=newdate;
+
+               /* $("#month").html("");
+                if(yearnum!=2018){    //判断不是当前年份
+                    for (var j=1;j<=12;j++){
+                        $("#month").append(
+                            "<option  value='"+yearnum+"-"+j+"-01"+"'  onclick='ccc("+j+")'>"+yearnum+"年"+j+"月"+"</option>"
+                        )
+                    }
+                    else if (yearnum!=2018){
+
+                    }
+                }else{
+                    for (var k=0;k<=monthnum-6;k++){
+                        var month=6+k;
+                        $("#month").append(
+                            "<option  value='"+yearnum+"-"+month+"-01"+"' onclick='ccc("+month+")'>"+yearnum+"年"+month+"月"+"</option>"
+                        )
+                    }
+
+                }*/
+
+                /**
+                 * 用当前年份的当前月份
+                 **/
                 var time1 = new Date().Format("yyyy-MM-dd");
+                //刚进入的时候将当前时间渲染到日历表上
                 $("#date").val(time1);
+
                 visitors();
             });
+
+            function yearchenge(index){
+                $("#month").html("");
+                yearvalue=index;
+
+                var monthnum = new Date().Format("MM");     //默认开始时间为2019-7
+                var yearnum1 = index;
+                var newyear = new Date().Format("yyyy");;
+
+                if(index==2018){    //判断不是当前年份
+                    for (var j=0;j<=5;j++){
+
+                        $("#month").append(
+                            "<option value='"+index+"-"+(7+j)+"-01"+"'  onclick='ccc("+(7+j)+")'>"+index+"年"+(7+j)+"月"+"</option>"
+                        )
+                    }
+
+                }else if(newyear>index>2018){
+                    for (var j=1;j<=12;j++){
+                        $("#month").append(
+                            "<option value='"+yearnum1+"-"+j+"-01"+"'  onclick='ccc("+j+")'>"+yearnum1+"年"+j+"月"+"</option>"
+                        )
+                    }
+                }
+                else if(index==newyear){
+                    for (var k=1;k<=monthnum;k++){
+
+                        $("#month").append(
+                            "<option value='"+yearnum1+"-"+k+"-01"+"'  onclick='ccc("+k+")'>"+yearnum1+"年"+k+"月"+"</option>"
+                        )
+                    }
+
+                }
+            }
+
+            function ccc(index){
+                if(index.toString().length==1){
+                    value=yearvalue+"-"+"0"+index+"-"+"01";
+                }
+                else{
+                    value=yearvalue+"-"+index+"-"+"01";
+                }
+                visitors();
+                console.log(index);
+            }
 
             /*点击分类下拉框的时候重新加载统计图*/
             $("option").click(function () {
                 visitors();
             });
 
+            $(".monthlist").click(function () {
+            });
+
             function date(){
                 visitors();
             }
-            
 
             /*统计方法*/
             function visitors() {
@@ -155,7 +251,11 @@
                     var dayoldcount=res1.data.old.counts;
 
 
-
+                    if(value!=null){
+                        datevaalue=value;
+                    }else{
+                        var datevaalue=$("#month").val();
+                    }
                         $.get(path + "/v1/statistical/month", map, function (res2) {  // 本月
 
                     var monthdate=res2.data.new.times;
@@ -166,7 +266,7 @@
                                 timestamp:time,
                                 nonce:time,
                                 token:token,
-                                date:$("#month").val(),
+                                date:datevaalue,
                             }) + token + time + time);
 
                             $.get(path + "/v1/statistical/newmonth",
@@ -175,7 +275,7 @@
                                     timestamp:time,
                                     nonce:time,
                                     token:token,
-                                    date:$("#month").val(),
+                                    date:datevaalue,
                                     sign:sign.toUpperCase(),
                                 }
 
@@ -203,6 +303,7 @@
                             Xdata=daydate;
                             countdata=daycount;
                             olddata=dayoldcount;
+                        $("#yearlist").hide();
                             $("#date").show();
                             $("#week").hide();
                             $("#month").hide();
@@ -212,6 +313,7 @@
                             Xdata=weekdate;
                             countdata=weekcount;
                             olddata=weekoldcount;
+                        $("#yearlist").hide();
                             $("#date").hide();
                             $("#week").show();
                             $("#month").hide();
@@ -231,6 +333,7 @@
                             countdata=monthcount;
                             olddata=montholdcount;
                             $("#date").hide();
+                            $("#yearlist").show();
                             $("#month").show();
                             $("#week").hide();
                         $("#year").hide();
@@ -263,7 +366,6 @@
                             olddata=yearoldcount;
                         }
                         }
-
                    option = {
                     title: {
                         text: '客流统计'
