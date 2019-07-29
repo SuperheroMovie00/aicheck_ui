@@ -355,6 +355,7 @@
                         $("#date").hide();
                         $("#month").hide();
                         $("#week").hide();
+                        $("#yearlist").hide();
                         $("#year").show();
                         if($("#year").val()=='2'){
                             Xdata=newyeardate;
@@ -374,7 +375,7 @@
                         trigger: 'axis'
                     },
                     legend: {
-                        data:['总客流量',"会员流量"]
+                        data:['总客流量',"非会员流量"]
                     },
                     grid: {
                         left: '3%',
@@ -405,7 +406,7 @@
                         },
 
                         {
-                            name:'会员流量',
+                            name:'非会员流量',
                             type:'line',
                             stack: '总量',
                             data: olddata,

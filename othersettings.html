@@ -6,13 +6,117 @@
 
 
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-<title>AI</title>
-<link type="text/css" rel="stylesheet" href="style/index.css">
-<link type="text/css" rel="stylesheet" href="style/reset.css">
-<link type="text/css" rel="stylesheet" href="style/swiper.min.css">
-<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>AI</title>
+    <link type="text/css" rel="stylesheet" href="style/index.css">
+    <link type="text/css" rel="stylesheet" href="style/reset.css">
+    <link type="text/css" rel="stylesheet" href="style/swiper.min.css">
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/path.js"></script>
+    <script type="text/javascript" src="js/md5.js"></script>
+
+    <script>
+
+       $(function () {
+           pathinit();
+       });
+
+
+       function pathinit() {
+           var sign = $.md5(jsonSort(map) + token + time + time);
+           map.sign = sign.toUpperCase();
+           $.get(path + "/v1/pathseting/findallpath",map,function (res) {
+
+               for (var k in res.data){
+
+                   if (res.data[k].type == "visitors") {
+                       $("#visitorspath").val(res.data[k].path);
+                   }
+                   if (res.data[k].type == "ai") {
+                       $("#aipath").val(res.data[k].path);
+                   }
+                   if (res.data[k].type == "customer") {
+                       $("#customerpath").val(res.data[k].path);
+                   }
+                   if (res.data[k].type == "deletevisitorytime") {
+
+                       var rObj = document.getElementsByName("time");
+
+                       for(var i = 0;i < rObj.length;i++){
+                               if(rObj[i].value == res.data[k].path){
+                                   rObj[i].checked =  'checked';
+                               }
+                       }
+                   }
+
+
+               }
+
+           },'');
+       }
+
+
+        
+        function submitseting(){
+            var visitorspath= $("#visitorspath").val();
+            var customerpath= $("#customerpath").val();
+            var aipath=$("#aipath").val();
+            //获取清理访客文件夹记录的时间周期
+            var deletevisitorytime=$("input[name='time']:checked").val();
+
+            var sign1 = $.md5(jsonSort( {
+                timestamp:time,
+                nonce:time,
+                token:token,
+                visitorspath:visitorspath,
+                customerpath:customerpath,
+                deletevisitorytime:deletevisitorytime,
+                aipath:aipath,
+
+            })+ token + time + time);
+
+            $.post(path + "/v1/pathseting/updatepathfore",
+                {
+                    timestamp: time,
+                    nonce: time,
+                    token: token,
+                    visitorspath: visitorspath,
+                    customerpath: customerpath,
+                    deletevisitorytime:deletevisitorytime,
+                    aipath: aipath,
+                    sign: sign1.toUpperCase(),
+            }
+                ,function (res) {
+
+                    if (res.code == 0){
+                    confirm("修改成功");
+                    }else{
+                        confirm("修改失败");
+                    }
+
+            },'json');
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+
+
 </head>
 
 <body>
@@ -45,15 +149,17 @@
 
  <li><span>访客文件夹<i class="abe-red"></i></span></li>
       <li>
-        <input type="text" class="text">
+        <input type="text" class="text" id="visitorspath">
       </li>
       <li><span>图片与视频文件夹<i class="abe-red"></i></span></li>
       <li>
-        <input type="text" class="text">
+        <input type="text" class="text" id="aipath">
+
       </li>
  <li><span>会员头像文件夹<i class="abe-red"></i></span></li>
       <li>
-        <input type="text" class="text">
+        <input type="text" class="text" id="customerpath">
+
       </li>
 	   
 	   <li><span>AI优化摄像机密码<i class="abe-red"></i></span></li>
@@ -66,18 +172,18 @@
        <li><span>清除访客记录<i class="abe-red"></i></span></li>
 
       <li>
-          <span class="ck-item"><input type="radio">每小时</span>
-		  <span class="ck-item"><input type="radio">一天</span>
-		  <span class="ck-item"><input type="radio">一周</span>
-		  <span class="ck-item"><input type="radio">一个月</span>
-		  <span class="ck-item"><input type="radio">三个月</span>
-		  <span class="ck-item"><input type="radio">半年</span>
-		  <span class="ck-item"><input type="radio">一年</span>
+          <span class="ck-item"><input type="radio" name="time"  value="hour">每小时</span>
+		  <span class="ck-item"><input type="radio" name="time"  value="day">一天</span>
+		  <span class="ck-item"><input type="radio" name="time"  value="week">一周</span>
+		  <span class="ck-item"><input type="radio" name="time"  value="month">一个月</span>
+		  <span class="ck-item"><input type="radio" name="time"  value="threemonth">三个月</span>
+		  <span class="ck-item"><input type="radio" name="time"  value="halfyear">半年</span>
+		  <span class="ck-item"><input type="radio" name="time"  value="oneyear">一年</span>
       </li>
 
       <li class="com-submit pdt_10">
                 
-                <input type="button" class="vi-btn-green" value="保存设置">
+                <input type="button" class="vi-btn-green" onclick="submitseting()" value="保存设置">
                 <input type="button" class="vi-btn-orange mlg_15" value="重置设置">
         </li>
     </ul>

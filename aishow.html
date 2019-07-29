@@ -119,7 +119,7 @@
                 );
                 for (var c = 0; c < res.data.length; c++) {
                     $("#defaultresourcenewer").append(
-                        "<div class='proimg'><a href='#' class='close iconfont' onclick='defaultdeleteadviceimage(" + res.data[c].id + ")' >&#xe602;</a> <img src='" + res.data[c].url + "' alt=''></div>"
+                        "<div class='proimg'><a href='#' class='close iconfont' onclick='deleteadviceimage(" + res.data[c].id + ")' >&#xe602;</a> <img src='" + res.data[c].url + "' alt=''></div>"
                     )
                 }
             },"json");
@@ -139,7 +139,7 @@
 
             formData.append("sign", sign.toUpperCase());
             $.ajax({
-                url: path + "/v1/customer/upload/visitors",
+                url: path + "/v1/customer/upload/ai",
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -477,7 +477,7 @@
             var sign = $.md5( token + time + time);
             formData.append("sign", sign.toUpperCase());
             $.ajax({
-                url: path + "/v1/customer/upload/visitors",
+                url: path + "/v1/customer/upload/ai",
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -537,7 +537,7 @@
             var sign = $.md5( token + time + time);
             formData.append("sign", sign.toUpperCase());
             $.ajax({
-                url: path + "/v1/customer/upload/visitors",
+                url: path + "/v1/customer/upload/ai",
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -599,6 +599,7 @@
                     confirm("删除资源成功");
                     //刷新图片
                     queryresource(strategyid);
+                    defaultupdategrouping();
                     querygroupimage(groupid);
 
                 } else {
