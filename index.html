@@ -10,10 +10,19 @@
     <link type="text/css" rel="stylesheet" href="style/reset.css">
     <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
     <script type="text/javascript" src="js/path.js"></script>
+    <script type="text/javascript" src="js/md5.js"></script>
+  <!--  <link rel="stylesheet" href="style/font_1174732_cp9lrsh51or/demo.css">
+    <link rel="stylesheet" href="style/font_1174732_cp9lrsh51or/iconfont.css">
+
+-->
+
 
 
     <script>
 
+        $(function () {
+            
+        });
 
         //点击登录按钮
         function login() {
@@ -32,6 +41,11 @@
                     confirm("登录失败");
                 }
             }, "json");
+        }
+
+        function closelogin(){
+            $("#loginwin").hide();
+            $("#cover").hide();
         }
 
 
@@ -86,7 +100,7 @@
 <div class="login-pop" style="display:none ;" id="loginwin">
     <ul>
         <li class="tit"><span class="abe-fl">登录系统</span>
-            <!--<a href="#" class="close iconfont abe-fr" onclick="closelogin()">&#xe60a;</a>--></li>
+            <a href="#" class="close iconfont abe-fr" onclick="closelogin()">&#xe60a;</a></li>
         <li><input type="text" class="txt" placeholder="请输入账号"></li>
         <li><input type="password" class="txt" placeholder="请输入密码"></li>
         <li><input type="submit" class="btn" onclick="submit()" value="登入人脸识别系统系统"></li>

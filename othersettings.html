@@ -57,7 +57,6 @@
        }
 
 
-        
         function submitseting(){
             var visitorspath= $("#visitorspath").val();
             var customerpath= $("#customerpath").val();
@@ -65,50 +64,79 @@
             //获取清理访客文件夹记录的时间周期
             var deletevisitorytime=$("input[name='time']:checked").val();
 
-            var sign1 = $.md5(jsonSort( {
-                timestamp:time,
-                nonce:time,
-                token:token,
-                visitorspath:visitorspath,
-                customerpath:customerpath,
-                deletevisitorytime:deletevisitorytime,
-                aipath:aipath,
-
-            })+ token + time + time);
-
-            $.post(path + "/v1/pathseting/updatepathfore",
-                {
-                    timestamp: time,
-                    nonce: time,
-                    token: token,
-                    visitorspath: visitorspath,
-                    customerpath: customerpath,
-                    deletevisitorytime:deletevisitorytime,
-                    aipath: aipath,
-                    sign: sign1.toUpperCase(),
+            if (visitorspath == "") {
+                confirm("访客文件夹路径不能为空");
+                return;
             }
-                ,function (res) {
 
-                    if (res.code == 0){
-                    confirm("修改成功");
-                    }else{
-                        confirm("修改失败");
-                    }
+            if (customerpath == "") {
+                confirm("会员头像文件夹路径不能为空");
+                return;
+            }
 
-            },'json');
+            if (aipath == "") {
+                confirm("图片与视频文件夹不能为空");
+                return;
+            }
 
+            if (visitorspath == customerpath || visitorspath == aipath || customerpath == aipath) {
+                confirm("文件夹路径不能存在相同");
+                return;
+            }
 
+                        var sign1 = $.md5(jsonSort({
+                            timestamp: time,
+                            nonce: time,
+                            token: token,
+                            visitorspath: visitorspath,
+                            customerpath: customerpath,
+                            deletevisitorytime: deletevisitorytime,
+                            aipath: aipath,
+
+                        }) + token + time + time);
+
+                        $.post(path + "/v1/pathseting/updatepathfore",
+                            {
+                                timestamp: time,
+                                nonce: time,
+                                token: token,
+                                visitorspath: visitorspath,
+                                customerpath: customerpath,
+                                deletevisitorytime: deletevisitorytime,
+                                aipath: aipath,
+                                sign: sign1.toUpperCase(),
+                            }
+                            , function (res) {
+
+                                if (res.code == 0) {
+                                    confirm("修改成功");
+                                } else {
+                                    confirm("修改失败");
+                                }
+
+                            }, 'json');
 
 
         }
 
 
+       function replacement() {
+
+           /**
+            * 重置文本框中的值
+            */
+           $("#visitorspath").val("");
+           $("#aipath").val("");
+           $("#customerpath").val("");
+
+           var rObj = document.getElementsByName("time");
+
+           for(var i = 0;i < rObj.length;i++){
+                   rObj[i].checked = false;
+           }
 
 
-
-
-
-
+       }
 
 
 
@@ -184,7 +212,7 @@
       <li class="com-submit pdt_10">
                 
                 <input type="button" class="vi-btn-green" onclick="submitseting()" value="保存设置">
-                <input type="button" class="vi-btn-orange mlg_15" value="重置设置">
+                <input type="button" class="vi-btn-orange mlg_15" onclick="replacement()" value="重置设置">
         </li>
     </ul>
 
