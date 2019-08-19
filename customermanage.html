@@ -25,6 +25,7 @@
     $(function () {
         //刚进入会员管理页面  将页数默认为1 每页记录数为10 开始查询数据
         querybypage(1);
+
     });
 
 
@@ -56,6 +57,7 @@
             var y=res.total%pagesize;
             if(y!=0){
                 total=s+1;
+
             }else{
                 total=s;
             }
