@@ -36,8 +36,7 @@
         $("#customerlist").html("");
 
         $("#lilist").html("");
-
-        map.currentPage=index;
+        map.currentPage=index; //(index-1)*pagesize  (index-1)*pagesize+pagesize
         map.pageSize=pagesize;
 
         var sign= $.md5(jsonSort(map)+token+time+time);
@@ -51,7 +50,7 @@
             //将数据库中取出的json以id排序
             var json=res.data.sort(compare("id"));
 
-//分页开始***********//
+            //分页开始***********//
             var total=0;
             var s=res.total/pagesize;
             var y=res.total%pagesize;
@@ -159,7 +158,7 @@
         <div class="user-info abe-fr"><span><em class="vi-green">admin</em>，您好！ </span> <a href="#" class="uhead"><img
                 src="images/user_head.jpg" alt=""></a></div>
         <nav class="abe-fr"><a href="customermanage.html" class="active">会员管理</a><a href="dataanalysis.html">数据分析</a><a href="aishow.html">AI显示</a><a
-                href="systemsettings.html">系统设置</a><a href="extendmodule.html">扩展模块</a></nav>
+                href="systemsettings.html">系统设置</a><a href="extendmodule.html">扩展模块</a><a href="tv.html">TV</a></nav>
     </div>
 </header>
 <div class="blank20"></div>

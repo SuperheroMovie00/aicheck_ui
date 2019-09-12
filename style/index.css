@@ -377,7 +377,30 @@ body { background: #f2f2f2; }
 .cl-from li .p48{width: 48%; margin-right: 0;}
 
 
+.cart-step { height: 60px; position: relative; padding-left: 180px; overflow: hidden; }
+.cart-step ul { width: 100%; margin-top:28px;}
+.cart-step ul li { width: 25%; height: 7px; float: left; background: #d6d6d6; position: relative; text-align: center; }
+.cart-step ul li:first-of-type { border-radius: 8px 0 0 8px; }
+.cart-step ul li:last-of-type { border-radius: 0 8px 8px 0; }
+.cart-step ul li em { display: inline-block; width: 20px; height: 20px; border-radius: 20px; background: #d6d6d6; position: absolute; left: 50%; margin-left: -10px; top: 50%; margin-top: -10px; text-align: center; line-height: 20px; color: #fff; }
+.cart-step ul li div { height: 20px; width: 100%; line-height: 20px; position: absolute; top:-28px; font-size: 14px; color: #b0b0b0; display: none;}
+.cart-step ul li.active { color: #f93; background: #f93; }
+.cart-step ul li.active em { background: #f93; }
+.cart-step ul li.active div { color: #f93; }
+.cart-step ul li.completed { color: #ffc388; background: #ffc388; }
+.cart-step ul li.completed em { background: #ffc388; }
+.cart-step ul li.completed div { color: #ffc388; }
+.cart-step .car-num{ width: 120px; height: 42px; background: #0069ff; text-align: center; font-size: 16px; color: #fff; border-radius: 5px; line-height: 42px; position: absolute; left: 0; top: 50%; margin-top: -21px;}
+.cart-step .car-num:before{display: block; content: ''; width: 110px; height: 32px; border: 2px #fff solid; position: absolute; left: 50%; top: 50%; margin-top: -18px; margin-left:-57px ;}
+.cs-ul-tit{height: 30px;}
+.cs-ul-tit ul li{background: none;}
+.cs-ul-tit ul li div{display: block; color: #f69100; font-weight: bold; font-size: 16px;}
 
+
+body,html{height: 100%; box-sizing: border-box; }
+.jcview{width: 100%; height: 100%; background: #fff; overflow: hidden; box-sizing: border-box; padding-top:90px;}
+.jcv-tit { width: 100%; height: 55px; line-height: 55px; position: fixed; background: #292c34; top: 0; left: 0; z-index: 998; text-align: center; color: #fff; font-size: 24px; font-weight: bold; letter-spacing:3px; }
+.jcv-info{width: 90%; margin: 0px auto;	}
 
 
 

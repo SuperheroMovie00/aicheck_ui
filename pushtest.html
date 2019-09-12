@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link type="text/css" rel="stylesheet" href="style/index.css">
+    <link type="text/css" rel="stylesheet" href="style/reset.css">
+    <link type="text/css" rel="stylesheet" href="style/swiper.min.css">
+    <script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="js/path.js"></script>
+    <script type="text/javascript" src="js/md5.js"></script>
+    <meta http-equiv="Access-Control-Allow-Origin" content="*" />
+    <script>
+
+
+
+
+
+
+
+
+
+
+        function registered() {
+            var persons = [{
+                "username": "dev1",
+                "password": "password"
+            }];
+
+            var url="localhost:80/v1/users/";
+            $.ajax({
+                url:url,
+                type:'POST',
+                data: persons,
+                dataType: "json",
+                xhrFields: {
+                    withCredentials: true
+                },
+                crossDomain: true,
+                headers:{
+                    'Authorization':"Basic ZWZiZGFkMTdhOWJlNTlhZDA4YWYyOGEwOmE2NjQxNGJjMWFiMDI3NGI3YTQ1MzVhNw==",
+                    'Content-Type':"applicat" +
+                        "ion/json;  charset=utf-8"
+        },
+                success:function (res) {
+                    alert(res.username+"注册成功");
+                }
+            });
+        }
+
+        
+        function add_friends() {
+            var persons = ["xialj"];       //这个是要加的用户的用户名
+            var username="hahcc";
+            $.ajax({
+                url:'https://api.im.jpush.cn/v1/users/'+username+'/friends',   //加用户的用户名
+                xhrFields: {withCredentials: true},
+                crossDomain: true,
+                type:'POST',
+                dataType: "jsonp",
+                data: persons,
+                headers:{
+                    'Authorization':"Basic ZWZiZGFkMTdhOWJlNTlhZDA4YWYyOGEwOmE2NjQxNGJjMWFiMDI3NGI3YTQ1MzVhNw==",
+                    'Content-Type':"application/json; charset=utf-8"
+                },
+                success:function (res) {
+                    if(!res){
+                        alert(res.username+"加好友成功");
+                    }
+                }
+            });
+        }
+        
+        function push_date() {           //推送
+
+            var persons = {
+                "platform": "all",
+                "audience" : "all",
+                "notification" : {
+                    "alert" : "Hi, JPush!",
+                    "android" : {
+                        "extras" : { "newsid" : 321}
+                    }
+                }
+            };
+
+            $.ajax({
+                url:'https://api.jpush.cn/v3/push',   //加用户的用户名
+                xhrFields: {withCredentials: true},
+                crossDomain: true,
+                type:'POST',
+                dataType: "jsonp",
+                data: persons,
+                headers:{
+                    'Authorization':"Basic ZWZiZGFkMTdhOWJlNTlhZDA4YWYyOGEwOmE2NjQxNGJjMWFiMDI3NGI3YTQ1MzVhNw==",
+                    'Content-Type':"application/json; charset=utf-8"
+                },
+                success:function (res) {
+                    if(!res){
+                        alert(res.username+"加好友成功");
+                    }
+                }
+            });
+        }
+        
+
+        function timing_push() {
+            var persons = {
+                "name": "定时推送示例",
+                "enabled": true,
+                "trigger": {
+                    "periodical": {
+                        "start":"2019-09-17 12:00:00",
+                        "end": "2019-10-18 12:00:00",
+                        "time": "12:00:00",
+                        "time_unit": "WEEK",
+                        "frequency": 2,
+                        "point": ["WED","FRI"]
+                    }
+                },
+                "push": {
+                    "platform": "all",
+                    "audience": "all",
+                    "notification": {
+                        "ios": {
+                            "alert":"this a test",
+                            "sound":"default",
+                            "badge":"+1"
+                        }
+                    },
+                    "message": {},
+                    "options": {"apns_production":"false"}
+                }
+            };
+
+            $.ajax({
+                url:'https://api.jpush.cn/v3/schedules',   //加用户的用户名
+                xhrFields: {withCredentials: true},
+                crossDomain: true,
+                type:'POST',
+                dataType: "jsonp",
+                data: persons,
+                headers:{
+                    'Authorization':"Basic ZWZiZGFkMTdhOWJlNTlhZDA4YWYyOGEwOmE2NjQxNGJjMWFiMDI3NGI3YTQ1MzVhNw==",
+                    'Content-Type':"application/json; charset=utf-8"
+                },
+                success:function (res) {
+                    if(res){
+                        alert(res.name);
+                    }
+                }
+            });
+        }
+
+        function query_timing_push() {
+            var persons = {
+                "total_count":1000,
+                "total_pages":5,
+                "page":4,
+                "schedules":[
+                    {"schedule_id":"0eac1b80-c2ac-4b69-948b-c65b34b96512","name":""}
+                ]
+            };
+
+            $.ajax({
+                url:'https://api.jpush.cn/v3/schedules',   //加用户的用户名
+                xhrFields: {withCredentials: true},
+                crossDomain: true,
+                type:'GET',
+                dataType: "jsonp",
+                data: persons,
+                headers:{
+                    'Authorization':"Basic ZWZiZGFkMTdhOWJlNTlhZDA4YWYyOGEwOmE2NjQxNGJjMWFiMDI3NGI3YTQ1MzVhNw==",  //固定的秘钥
+                    'Content-Type':"application/json; charset=utf-8"                          //内容数据的类型
+                },
+                success:function (res) {
+                    if(res){
+
+                    }
+                }
+            });
+        }
+        
+        
+        function poto_push_date() {
+            var persons = {
+
+
+                "platform": "all",
+                "audience" : "all",
+                "notification" : {
+                    "android" : {
+                        "alert" : "hello, JPush!",
+                        "title" : "JPush test",
+                        "builder_id" : 3,
+                        "style":1 ,
+                        "alert_type":1 ,
+                        "big_text":"big text content",
+                        "inbox":{},
+                        "big_pic_path":"picture url",
+                        "priority":0,
+                        "category":"category str",
+                        "large_icon": "http://www.jiguang.cn/largeIcon.jpg",  //图片内容
+                        "intent": {
+                            "url": "intent:#Intent;component=com.jiguang.push/com.example.jpushdemo.SettingActivity;end"
+                        },
+                        "extras" : {
+                            "news_id" : 134,
+                            "my_key" : "a value"
+                        }
+                    }
+                }
+            };
+
+            $.ajax({
+                url:'https://api.jpush.cn/v3/push',   //加用户的用户名
+                xhrFields: {withCredentials: true},
+                crossDomain: true,
+                type:'POST',
+                dataType: "jsonp",
+                data: persons,
+                headers:{
+                    'Authorization':"Basic ZWZiZGFkMTdhOWJlNTlhZDA4YWYyOGEwOmE2NjQxNGJjMWFiMDI3NGI3YTQ1MzVhNw==",  //固定的秘钥
+                    'Content-Type':"application/json; charset=utf-8"                          //内容数据的类型
+                },
+                success:function (res) {
+                    if(res){
+                       // "sendno": "0",
+                       //"msg_id": "2251826844463049"
+                    }
+                }
+            });
+        }
+        
+        
+
+    </script>
+
+</head>
+<body>
+        <input type="button" value="极光im注册用户测试" onclick="registered()">
+        <input type="button" value="极光im加好友测试" onclick="add_friends()">
+        <input type="button" value="极光push推送消息测试" onclick="push_date()">
+        <input type="button" value="极光push推送消息图文消息测试" onclick="poto_push_date()">
+        <input type="button" value="极光push定时推送消测试" onclick="timing_push()">
+        <input type="button" value="极光push获取所有的定时任务测试" onclick="query_timing_push()">
+</body>
+</html>

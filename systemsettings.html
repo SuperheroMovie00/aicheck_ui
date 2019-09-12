@@ -228,6 +228,19 @@
             window.localStorage.setItem("deviceid", index);
         }
 
+        function deletedevice(){
+
+            var sign = $.md5(jsonSort(map) + token + time + time);
+            map.sign = sign.toUpperCase();
+            $.post(path + "/v1/device/deletedevice", map, function (res) {
+                if (res.code == 0) {
+                    querydevice(1);
+                } else {
+
+                }
+            }, "json");
+        }
+
 
     </script>
 
@@ -241,7 +254,7 @@
                 src="images/user_head.jpg" alt=""></a></div>
         <nav class="abe-fr"><a href="customermanage.html">会员管理</a><a href="dataanalysis.html">数据分析</a><a
                 href="aishow.html">AI显示</a><a
-                href="systemsettings.html" class="active">系统设置</a><a href="extendmodule.html">扩展模块</a></nav>
+                href="systemsettings.html" class="active">系统设置</a><a href="extendmodule.html">扩展模块</a><a href="tv.html">TV</a></nav>
     </div>
 </header>
 <div class="blank20"></div>
@@ -256,6 +269,9 @@
     </div>
     <div class="content abe-fr">
         <div class="local"> 当前位置<em class="abe-space">&gt;</em><span class="abe-gray3">会员管理</span></div>
+
+        <input type="button" style="float: right"  value="清除设备" onclick="deletedevice()">
+
         <div class="table-box">
             <table width="100%" border="1" class="user-tb">
                 <thead>
@@ -330,6 +346,10 @@
             $(this).css({"margin-left": -pw, "margin-top": -ph});
         });
     });
+
+
+
+
 </script>
 
 <div class="icp">Copyright © 2006 - 2015 人脸识别系统版权所有 沪ICP备 0000001号</div>

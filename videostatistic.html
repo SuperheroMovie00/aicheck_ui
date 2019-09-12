@@ -46,8 +46,6 @@
                 <input type="button" value="双目摄像机测试" onclick="videostatisctest()" >
 
 
-
-
                 <select id="selectno">
                     <option value="4">按日</option>
                     <option value="5">按周</option>
@@ -65,6 +63,8 @@
 
 
         <div id="container" style="height:400px"></div>
+
+
 
 
         <script type="text/javascript">
@@ -207,7 +207,8 @@
                         myChart.setOption(option, true);
                     }
                     }else{
-                        confirm(res.msg);
+
+
                     }
 
                 }, "json");

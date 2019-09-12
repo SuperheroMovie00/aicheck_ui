@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<title>AI</title>
+<link type="text/css" rel="stylesheet" href="style/index.css">
+<link type="text/css" rel="stylesheet" href="style/reset.css">
+<link type="text/css" rel="stylesheet" href="style/swiper.min.css">
+<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="js/echarts.min.js"></script>
+  <script type="text/javascript" src="js/path.js"></script>
+  <script type="text/javascript" src="js/md5.js"></script>
+
+
+</head>
+
+
+
+<body style="padding-top: 0;">
+
+
+<div class="jcview">
+
+  <select id="type" style="float:right;margin-right: 60px;">
+    <option value="1">显示全部车辆</option>
+    <option value="2">显示未完成车辆</option>
+  </select>
+
+  <input type="button" style="float:right;" value="清零" onclick="deleteall()">
+
+
+
+  <div class="jcv-tit"><a href="customermanage.html" style="float: left;font-size: 10px;"><font color="white">回列表</font></a>上海某某某汽车4S店—车辆进厂状态进度展示</div>
+
+  <div class="jcv-info">
+    <div class="cart-step cs-ul-tit">
+      <ul class="">
+        <li>
+          <div>1.车辆进厂</div>
+        </li>
+        <li>
+          <div>2.车辆洗车</div>
+        </li>
+        <li>
+          <div>3.洗车结束</div>
+        </li>
+        <li>
+          <div>4.车辆离厂</div>
+        </li>
+      </ul>
+    </div>
+    <div id="carAClist">
+    </div>
+
+
+  </div>
+  <div class="abe-page course-list-page pdt_30 pdb_30">
+    <ul id="lilist" class="abe-pagination admin-content-pagination">
+
+    </ul>
+  </div>
+</div>
+</body>
+
+<script type="text/javascript">
+  var html ;
+  var pagesize=1;
+
+  $(function () {
+    carAC(1);
+  });
+
+
+  $("option").click(function () {
+    carAC(1);
+  });
+
+  function deleteall(){
+    var sign = $.md5(jsonSort(map) + token + time + time);
+    map.sign = sign.toUpperCase();
+    $.post(path + "/v1/Carstatistics/delteall", map, function (res) {
+      if(res.code==0){
+        carAC(1);
+      }
+    }, "json");
+
+  }
+
+
+  function carAC(index) {
+
+    map.type=$("#type").val();
+    map.pageSize=pagesize;
+    map.currentPage=index;
+    var sign = $.md5(jsonSort(map) + token + time + time);
+    map.sign = sign.toUpperCase();
+    console.log(sign);
+    $("#carAClist").html("");
+    $("#lilist").html("");
+    $.post(path + "/v1/Carstatistics/querycar", map, function (res) {
+
+
+      var total=0;
+      var s=parseInt(res.data.totalElements/pagesize);
+      var y=res.data.totalElements%pagesize;
+      if(y!=0){
+          total=s+1;
+      }else{
+        total=s;
+      }
+
+      //预设分页（将记录总数取出来除以 pagesize 就得到了页码数）
+      $("#lilist").append("<li><a href='#'>"+"«"+"</a></li>");
+      for (var c = 1; c <= total; c++) {
+        $("#lilist").append("<li onclick='carAC(" + c + ")' id='"+c+"' name='" + c + "'><a>" + c + "</a></li>");
+      }
+      //最后加上一个下一页
+      $("#lilist").append("<li><a href='#'>"+"»"+"</a></li>");
+      //分页结束***********//
+
+
+      for (var i=1;i<=res.data.content.length;i++){
+        $("#carAClist").append(
+                "<div class='cart-step'>"+
+                "<div class='car-num'>"+res.data.content[i-1].carnumber+"</div>"+
+                "<ul id='"+i+"'>"+
+                "</ul>"+
+                "</div>"
+        );
+
+        switch (res.data.content[i-1].schedule) {
+          case 1:
+            $("#"+i).append(
+                    "<li class='active'><em>"+1+"</em></li>"+
+                    "<li ><em>"+2+"</em></li>"+
+                    "<li ><em>"+3+"</em></li>"+
+                    "<li ><em>"+4+"</em></li>"
+            );
+            break;
+          case 2:
+            $("#"+i).append(
+                    "<li class='active'><em>"+1+"</em></li>"+
+                    "<li class='active'><em>"+2+"</em></li>"+
+                    "<li ><em>"+3+"</em></li>"+
+                    "<li ><em>"+4+"</em></li>"
+            );
+            break;
+          case 3:
+            $("#"+i).append(
+                    "<li class='active'><em>"+1+"</em></li>"+
+                    "<li class='active'><em>"+2+"</em></li>"+
+                    "<li class='active'><em>"+3+"</em></li>"+
+                    "<li ><em>"+4+"</em></li>"
+            );
+            break;
+          case 4:
+            $("#"+i).append(
+                    "<li class='active'><em>"+1+"</em></li>"+
+                    "<li class='active'><em>"+2+"</em></li>"+
+                    "<li class='active'><em>"+3+"</em></li>"+
+                    "<li class='active'><em>"+4+"</em></li>"
+            );
+            break;
+        }
+
+      }
+
+    }, "json");
+  }
+
+
+</script>
+
+
+
+</html>

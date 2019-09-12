@@ -11,19 +11,26 @@
 
         $(function () {
 
+/*
 
-
+            map.carnumber="豫f yyyyy";
+            map.schedule=1;
             var sign = $.md5(jsonSort(map) + token + time + time);
             map.sign = sign.toUpperCase();
             console.log(sign);
 
-            /*查出根据性别的统计*/
-            $.get(path + "/v1/statistical/newyear", map, function (res) {
+            /!*查出根据性别的统计*!/
+            $.post(path + "/v1/Carstatistics/addcarlicence", map, function (res) {
 
 
             }, "json");
+*/
 
 
+        });
+
+        $("option").click(function () {
+            alert("ccc");
         });
 
 
@@ -32,6 +39,17 @@
 
 </head>
 <body>
+
+<select id="type" style="float:right;margin-right: 60px;">
+    <option value="1">显示全部车辆</option>
+    <option value="2">显示未完成车辆</option>
+</select>
+
+<select id="selectno">
+    <option value="4">按日</option>
+    <option value="5">按周</option>
+    <option value="6">按年</option>
+</select>
 
 
 <font style="font-weight: bold"></font>
