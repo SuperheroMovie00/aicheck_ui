@@ -3,8 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="https://cdn.staticfile.org/angular.js/1.4.6/angular.min.js"></script>
+
+    <script>
+        var app = angular.module('myApp', []);
+        app.controller('myCtrl', function($scope) {
+            $scope.firstName= "John";
+            $scope.lastName= "Doe";
+        });
+
+    </script>
+
 </head>
 <body>
+
+
+<!--<div ng-app="myApp" ng-controller="myCtrl">-->
+<!--    <p> 姓:<input type="text" ng-model="firstName"></p>-->
+<!--    <p> 名:<input type="text" ng-model="lastName"></p>-->
+<!--    <p> 哈:<input type="text" ng-model="pars=[1,2,4,52]"></p>-->
+<!--    <p> 名字 {{firstName+lastName}}</p>-->
+<!--    <p> 名字 {{pars[3]}}</p>-->
+<!--    <p> cccc {{9/6}}</p>-->
+
+<!--</div>-->
+
+<!--
+
+<div ng-app="" ng-init="names=['Jani','Hege','Kai']">
+    <p>使用 ng-repeat 来循环数组</p>
+    <ul>
+        <li ng-repeat="x in names">
+            {{ x }}
+        </li>
+    </ul>
+</div>
+-->
+
+
+<form ng-app="" name="myForm" ng-init="myText = 'test@runoob.com'">
+    Email:
+    <input type="email" name="myAddress" ng-model="myText" required></p>
+    <h1>状态</h1>
+    {{myForm.myAddress.$valid}}
+    {{myForm.myAddress.$dirty}}
+    {{myForm.myAddress.$touched}}
+</form>
 
 
 </body>
